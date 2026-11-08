@@ -362,10 +362,10 @@
           <div class="card p-4 shadow-sm border-0">
             <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-book-bookmark me-2"></i>Tata Tertib Lingkungan GreenHarmoni</h5>
             <ol class="lh-lg text-secondary">
-              <td>Tamu yang menginap lebih dari 1x24 jam wajib melapor kepada Ketua RT/Pengurus.</td>
-              <td>Iuran bulanan (Keamanan, Kebersihan, Kas RT, PKK, Rukmat) maksimal dibayarkan tanggal 10 setiap bulannya.</td>
-              <td>Kerja bakti wajib diikuti minimal 1 perwakilan dari setiap rumah.</td>
-              <td>Dilarang membuat kegaduhan yang mengganggu ketenangan tetangga di atas pukul 22.00 WIB.</td>
+              <li>Tamu yang menginap lebih dari 1x24 jam wajib melapor kepada Ketua RT/Pengurus.</li>
+              <li>Iuran bulanan (Keamanan, Kebersihan, Kas RT, PKK, Rukmat) maksimal dibayarkan tanggal 10 setiap bulannya.</li>
+              <li>Kerja bakti wajib diikuti minimal 1 perwakilan dari setiap rumah.</li>
+              <li>Dilarang membuat kegaduhan yang mengganggu ketenangan tetangga di atas pukul 22.00 WIB.</li>
             </ol>
           </div>
         </section>
@@ -416,7 +416,7 @@
       }
     }
 
-    // LOGIN & RESET FORM (Agar Username/Pass Tidak Tertinggal)
+    // LOGIN & RESET FORM (Payload JSON Stringified)
     document.getElementById("form-login").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("btn-login");
@@ -426,20 +426,28 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i>Memeriksa...`;
       alertBox.classList.add("hidden");
 
-      const formData = new URLSearchParams();
-      formData.append("action", "login");
-      formData.append("username", document.getElementById("login-username").value.trim());
-      formData.append("password", document.getElementById("login-password").value.trim());
+      const payload = {
+        action: "login",
+        username: document.getElementById("login-username").value.trim(),
+        password: document.getElementById("login-password").value.trim()
+      };
 
       try {
-        const response = await fetch(API_URL, { method: "POST", body: formData });
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+        
         const result = await response.json();
 
         if (result.status === "success") {
           localStorage.setItem("user_rt", JSON.stringify(result.user));
           currentUser = result.user;
           
-          // Kosongkan Form Login
+          // Reset input username & password agar bersih saat di-logout
           document.getElementById("login-username").value = "";
           document.getElementById("login-password").value = "";
           
@@ -510,7 +518,7 @@
       }
     }
 
-    // CALCULATE SALDO & CARDS
+    // CALCULATE KAS TOTALS
     function calcTotals(rows) {
       let masuk = 0, keluar = 0;
       rows.forEach(r => {
@@ -540,7 +548,7 @@
 
         renderCharts(statRT, statPam, statPkk, statRuk);
       } catch (err) {
-        console.error(err);
+        console.error("Gagal memuat dashboard:", err);
       }
     }
 
@@ -575,7 +583,7 @@
       });
     }
 
-    // DATATABLE FINANCIAL KAS (WITH EXPORT EXCEL & PRINT)
+    // DATATABLE FINANCIAL KAS (EXPORT EXCEL & PRINT)
     async function loadFinancialTable(sheetName) {
       if (dataTablesInstances['keuangan']) {
         dataTablesInstances['keuangan'].destroy();
@@ -667,22 +675,29 @@
       }
     }
 
-    // SIMPAN TRANSAKSI KEUANGAN
+    // SIMPAN TRANSAKSI KEUANGAN (Payload JSON Stringified)
     document.getElementById("form-tx").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("btn-save-tx");
       btn.disabled = true;
 
-      const formData = new URLSearchParams();
-      formData.append("action", "add_keuangan");
-      formData.append("sheet_target", document.getElementById("tx-sheet-target").value);
-      formData.append("jenis", document.getElementById("tx-jenis").value);
-      formData.append("tanggal", document.getElementById("tx-tanggal").value);
-      formData.append("nominal", document.getElementById("tx-nominal").value);
-      formData.append("keterangan", document.getElementById("tx-keterangan").value);
+      const payload = {
+        action: "add_keuangan",
+        sheet_target: document.getElementById("tx-sheet-target").value,
+        jenis: document.getElementById("tx-jenis").value,
+        tanggal: document.getElementById("tx-tanggal").value,
+        nominal: document.getElementById("tx-nominal").value,
+        keterangan: document.getElementById("tx-keterangan").value
+      };
 
       try {
-        const res = await fetch(API_URL, { method: "POST", body: formData });
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
         const result = await res.json();
 
         if (result.status === "success") {
