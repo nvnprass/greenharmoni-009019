@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#eef5f7">
-  <title>Sistem Informasi RT009/019 - Lubang Buaya - Setu - Bekasi </title>
+  <title>Sistem Informasi RT009/019</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -279,9 +279,9 @@
         <div class="intro-mark"><i class="bi bi-buildings"></i></div>
         <div class="text-uppercase fw-bold mb-3" style="font-size:11px;letter-spacing:.18em;color:#579092;">Portal Layanan Warga</div>
         <h1>Sistem Informasi<br>Rukun Tangga</h1>
-        <p>Platform informasi lingkungan RT009/019, Desa Lubang Buaya, Kecamatan Setu, Kabupaten Bekasi.</p>
+        <p>Platform informasi dan pencatatan kegiatan lingkungan RT009/019, Desa Lubang Buaya, Kecamatan Setu, Kabupaten Bekasi.</p>
         <div class="intro-pills">
-          <span class="intro-pill"><i class="bi bi-wallet2 me-1"></i>Kas</span>
+          <span class="intro-pill"><i class="bi bi-wallet2 me-1"></i> Transparansi kas</span>
           <span class="intro-pill"><i class="bi bi-people me-1"></i> Data warga</span>
           <span class="intro-pill"><i class="bi bi-calendar3 me-1"></i> Kalender kerja</span>
         </div>
@@ -289,6 +289,13 @@
     </div>
     <div class="login-panel">
       <div class="login-card">
+        <div class="d-flex align-items-center gap-2 mb-4">
+          <div class="brand-icon" style="width:38px;height:38px;border-radius:12px;"><i class="bi bi-house-heart"></i></div>
+          <div>
+            <div class="fw-bold" style="font-family:'Plus Jakarta Sans';font-size:13px;">RT009/019</div>
+            <div class="small text-secondary">Desa Lubang Buaya</div>
+          </div>
+        </div>
         <h2>Selamat datang</h2>
         <div class="sub">Masuk menggunakan akun yang telah terdaftar.</div>
         <form id="loginForm">
@@ -401,7 +408,7 @@
       token: sessionStorage.getItem('sirt_token') || '',
       user: JSON.parse(sessionStorage.getItem('sirt_user') || 'null'),
       page: 'dashboard',
-      chart: null,
+      charts: [],
       calendar: null,
       calendarYear: null,
       calendarEvents: [],
@@ -643,9 +650,16 @@
         ['kas_pkk', 'Kas PKK', 'bi-people', 'tone-gold'],
         ['kas_rukmat', 'Kas RUKMAT', 'bi-heart-pulse', 'tone-purple']
       ];
+      const chartColors = {
+        kas_rt: { background: 'rgba(63,143,139,.72)', border: '#3f8f8b' },
+        kas_pamsimas: { background: 'rgba(93,145,198,.72)', border: '#5d91c6' },
+        kas_pkk: { background: 'rgba(205,158,82,.72)', border: '#cd9e52' },
+        kas_rukmat: { background: 'rgba(143,122,190,.72)', border: '#8f7abe' }
+      };
+
       document.getElementById('pageContent').innerHTML = `
         <div class="page-heading">
-          <div><h2>Ringkasan Dashboard</h2><p>Ikhtisar saldo seluruh kas dan pergerakan transaksi selama 12 bulan terakhir.</p></div>
+          <div><h2>Ringkasan Dashboard</h2><p>Ikhtisar saldo seluruh kas dan pergerakan masing-masing kas selama 12 bulan terakhir.</p></div>
           <div class="small-note"><i class="bi bi-arrow-repeat me-1"></i>Data diperbarui saat halaman dibuka</div>
         </div>
         <div class="stat-grid">
@@ -656,44 +670,85 @@
               <div class="stat-caption">Saldo berjalan · seluruh periode</div>
             </div>`).join('')}
         </div>
-        <div class="panel">
-          <div class="panel-head"><div><h3 class="panel-title">Grafik Pergerakan Kas</h3><div class="panel-subtitle">Nilai bersih pemasukan dikurangi pengeluaran per bulan</div></div><span class="badge-soft badge-neutral">12 bulan</span></div>
-          <div class="panel-body"><div class="chart-wrap"><canvas id="dashboardChart"></canvas></div></div>
+        <div class="d-flex flex-column gap-3" id="dashboardChartList">
+          ${cards.map(([key,label]) => `
+            <section class="panel">
+              <div class="panel-head">
+                <div><h3 class="panel-title">Grafik ${label}</h3><div class="panel-subtitle">Saldo bersih bulanan · pemasukan dikurangi pengeluaran</div></div>
+                <span class="badge-soft badge-neutral">12 bulan terakhir</span>
+              </div>
+              <div class="panel-body"><div class="chart-wrap"><canvas id="dashboardChart_${key}" aria-label="Grafik ${label} per bulan" role="img"></canvas></div></div>
+            </section>`).join('')}
         </div>`;
-      const ctx = document.getElementById('dashboardChart');
-      if (state.chart) state.chart.destroy();
-      const colors = {
-        kas_rt: { bg: 'rgba(63,143,139,.72)', border: '#3f8f8b' },
-        kas_pamsimas: { bg: 'rgba(93,145,198,.72)', border: '#5d91c6' },
-        kas_pkk: { bg: 'rgba(205,158,82,.72)', border: '#cd9e52' },
-        kas_rukmat: { bg: 'rgba(143,122,190,.72)', border: '#8f7abe' }
-      };
-      state.chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: data.chart.labels,
-          datasets: Object.keys(CASH_LABELS).map(key => ({
-            label: CASH_LABELS[key],
-            data: data.chart.series[key],
-            backgroundColor: colors[key].bg,
-            borderColor: colors[key].border,
-            borderWidth: 1,
-            borderRadius: 5,
-            maxBarThickness: 24
-          }))
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, padding: 18, color: '#71818a', font: { family: 'DM Sans', size: 11 } } },
-            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + money(ctx.raw) } }
+
+      // Hancurkan chart lama sebelum membuat ulang agar tidak terjadi duplikasi canvas.
+      (state.charts || []).forEach(chart => {
+        if (chart && typeof chart.destroy === 'function') chart.destroy();
+      });
+      state.charts = [];
+
+      cards.forEach(([key, label]) => {
+        const canvas = document.getElementById('dashboardChart_' + key);
+        if (!canvas) return;
+        const palette = chartColors[key];
+        const values = (data.chart && data.chart.series && data.chart.series[key]) || [];
+        const chart = new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: data.chart.labels,
+            datasets: [{
+              label: 'Saldo bersih ' + label,
+              data: values,
+              backgroundColor: palette.background,
+              borderColor: palette.border,
+              borderWidth: 1,
+              borderRadius: 6,
+              borderSkipped: false,
+              maxBarThickness: 34
+            }]
           },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#91a0a7', font: { size: 10 } } },
-            y: { grid: { color: '#eef2f3' }, ticks: { color: '#91a0a7', font: { size: 10 }, callback: value => shortMoney(value) } }
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  boxWidth: 7,
+                  boxHeight: 7,
+                  padding: 18,
+                  color: '#71818a',
+                  font: { family: 'DM Sans', size: 11 }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: context => context.dataset.label + ': ' + money(context.raw)
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#91a0a7', font: { size: 10 }, maxRotation: 0 }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: '#eef2f3' },
+                ticks: {
+                  color: '#91a0a7',
+                  font: { size: 10 },
+                  callback: value => shortMoney(value)
+                }
+              }
+            }
           }
-        }
+        });
+        state.charts.push(chart);
       });
     }
 
