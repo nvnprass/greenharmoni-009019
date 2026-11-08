@@ -346,7 +346,9 @@
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwU9V0eK2V8cK9xU9V0eK2V8cK9x/exec"; // Dummy URL
+    // URL ASLI DIKEMBALIKAN
+    const API_URL = "https://script.google.com/macros/s/AKfycbyMwaKqKY0cXrsUZkEIyA0I4Bn9QRa5xxaKiuKPuzXCcyqEnZgDLgaqsvcMZkbLV_cp4g/exec";
+    
     let dtTableKas = null, dtTablePam = null;
     let rawKasData = [], rawPamData = [];
     let modalKasBs, modalPamBs;
@@ -367,13 +369,21 @@
       else $("#view-app").addClass("hidden"); $("#view-login").removeClass("hidden");
     });
 
+    // POST FETCH OPTIONS (ANTI-CORS)
+    const postOptions = (payload) => ({
+      method: "POST",
+      redirect: "follow", // Wajib untuk bypass Apps Script redirect
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // Wajib text/plain agar tidak trigger CORS preflight
+      body: JSON.stringify(payload)
+    });
+
     // LOGIN LOGIC
     $("#form-login").submit(async (e) => {
       e.preventDefault();
       $("#btn-login").prop('disabled', true).text("Memeriksa...");
       try {
         const payload = {action: "login", username: $("#login-username").val(), password: $("#login-password").val()};
-        const res = await fetch(API_URL, { method:"POST", body: JSON.stringify(payload) });
+        const res = await fetch(API_URL, postOptions(payload));
         const out = await res.json();
         if(out.status === "success") {
           localStorage.setItem('user_rt_v2', JSON.stringify(out.user));
@@ -431,7 +441,6 @@
         loadPamsimasWarga();
       }
       else {
-        // Menu Kas Umum
         const titles = {'kas_rt':'Buku Kas RT', 'kas_pamsimas':'Buku Kas PAMSIMAS', 'kas_pkk':'Buku Kas PKK', 'kas_rukmat':'Buku Kas RUKMAT'};
         $("#nav-title").text(titles[menu]);
         $("#title-kas").text(titles[menu]);
@@ -441,9 +450,7 @@
       }
     }
 
-    // ==========================================
-    // KAS UMUM (CRUD, EXPORT, PRINT)
-    // ==========================================
+    // KAS UMUM
     async function loadKasData(sheet) {
       Swal.showLoading();
       try {
@@ -500,15 +507,12 @@
     $("#form-modal-kas").submit(async(e)=>{
       e.preventDefault();
       const payload = { action: "save_tx", sheet: $("#current-kas-sheet").val(), id: $("#mkas-id").val(), jenis: $("#mkas-jenis").val(), tanggal: $("#mkas-tanggal").val(), nominal: $("#mkas-nominal").val(), keterangan: $("#mkas-keterangan").val() };
-      const res = await fetch(API_URL, {method:"POST", body:JSON.stringify(payload)});
+      const res = await fetch(API_URL, postOptions(payload));
       const out = await res.json();
       if(out.status==="success") { Swal.fire("Berhasil", "Data Tersimpan", "success"); modalKasBs.hide(); loadKasData($("#current-kas-sheet").val()); }
     });
 
-
-    // ==========================================
-    // PAMSIMAS WARGA (SINKRONISASI LUNAS/BELUM)
-    // ==========================================
+    // PAMSIMAS
     async function loadPamsimasWarga() {
       Swal.showLoading();
       try {
@@ -571,14 +575,12 @@
         meter_akhir: $("#mp-makhir").val(), meter_tarif: $("#mp-mtarif").val(), biaya_beban: $("#mp-mbeban").val(), nominal: $("#mp-nominal").val(),
         metode_pembayaran: $("#mp-metode").val(), keterangan: $("#mp-keterangan").val()
       };
-      const res = await fetch(API_URL, {method:"POST", body:JSON.stringify(payload)});
+      const res = await fetch(API_URL, postOptions(payload));
       const out = await res.json();
       if(out.status==="success") { Swal.fire("Berhasil", "Tagihan diupdate!", "success"); modalPamBs.hide(); loadPamsimasWarga(); }
     });
 
-    // ==========================================
-    // MODULE CETAK (KWITANSI INDIVIDU)
-    // ==========================================
+    // CETAK KWITANSI INDIVIDU
     function cetakKwitansiKas(id, tgl, jenis, nominal, ket) {
       $("#print-kwitansi").removeClass("hidden"); $("#print-report").addClass("hidden");
       const dt = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -601,9 +603,7 @@
       window.print();
     }
 
-    // ==========================================
-    // MODULE CETAK LAPORAN & EXCEL (TABEL)
-    // ==========================================
+    // CETAK LAPORAN & EXCEL (TABEL)
     function printDataReport(isPam = false) {
       $("#print-kwitansi").addClass("hidden"); $("#print-report").removeClass("hidden");
       
@@ -627,7 +627,6 @@
         $("#pr-periode").text(`Filter Bulan: ${fBulan||'Semua'} | Tahun: ${fTahun||'Semua'}`);
         tableHtml += '<th>ID Transaksi</th><th>Tanggal</th><th>Jenis</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody>';
         
-        // Aplikasikan filter UI
         let filteredData = rawKasData;
         if(fBulan||fTahun) {
           filteredData = rawKasData.filter(r => {
