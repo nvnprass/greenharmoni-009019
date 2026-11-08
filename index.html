@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <!-- FullCalendar CSS v6 -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
   <style>
     :root {
@@ -126,6 +128,11 @@
 
     /* DataTables Custom Controls */
     .dt-buttons { display: none !important; }
+
+    /* Custom Styling for FullCalendar */
+    .fc .fc-toolbar-title { font-size: 1.2rem; font-weight: bold; color: var(--dark-bg); }
+    .fc .fc-button-primary { background-color: var(--primary-color); border-color: var(--primary-color); }
+    .fc .fc-button-primary:hover { background-color: #0b5ed7; border-color: #0a58ca; }
 
     /* Responsive Mobile Styling */
     @media (max-width: 991.98px) {
@@ -525,27 +532,26 @@
           </div>
         </section>
 
-        <!-- SECTION 4: KALENDER KERJA -->
+        <!-- SECTION 4: KALENDER KERJA (FULLCALENDAR INTEGRATED) -->
         <section id="sec-kalender" class="content-section hidden">
-          <div class="card p-4 shadow-sm border-0">
-            <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calendar-check me-2"></i>Kalender Kerja & Agenda RT</h5>
-            <div class="alert alert-info">Jadwal kegiatan rutin kerja bakti, rapat pengurus, dan posyandu lingkungan RT 009 / 019 Lubang Buaya.</div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong>Kerja Bakti Masal Lingkungan</strong>
-                  <div class="small text-muted">Setiap Minggu Ke-2 & Ke-4</div>
-                </div>
-                <span class="badge bg-success rounded-pill">Rutin</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong>Rapat Pleno Pengurus RT & PKK</strong>
-                  <div class="small text-muted">Setiap Malam Minggu Pertama</div>
-                </div>
-                <span class="badge bg-primary rounded-pill">Wajib</span>
-              </li>
-            </ul>
+          <div class="card p-3 p-md-4 shadow-sm border-0">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 border-bottom pb-3">
+              <div>
+                <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Kalender Kerja & Agenda RT</h5>
+                <small class="text-muted">Jadwal kegiatan rutin dan agenda lingkungan RT 009 / 019 Lubang Buaya</small>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-dark btn-sm px-3 fw-bold" onclick="printKalenderTahun()">
+                  <i class="fa-solid fa-print me-1"></i> Cetak Agenda 1 Tahun
+                </button>
+                <button id="btn-add-kalender" class="btn btn-primary btn-sm px-3 fw-bold hidden" onclick="openAddKalenderModal()">
+                  <i class="fa-solid fa-plus me-1"></i> Tambah Agenda
+                </button>
+              </div>
+            </div>
+
+            <!-- FullCalendar Render Container -->
+            <div id="calendar-container" class="p-2 bg-white rounded"></div>
           </div>
         </section>
 
@@ -656,7 +662,41 @@
     </div>
   </div>
 
-  <!-- ================= 5. TEMPLATE BUKTI CETAK KUITANSI TRANSAKSI (PRESISI 1 LEMBAR HANYA) ================= -->
+  <!-- ================= 5. MODAL ADD / EDIT KALENDER KERJA ================= -->
+  <div class="modal fade" id="modalKalender" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h6 class="modal-title fw-bold" id="modalKalenderTitle">Form Agenda RT</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="form-modal-kalender">
+          <div class="modal-body">
+            <input type="hidden" id="modal-kal-row-index">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tanggal Kegiatan</label>
+              <input type="date" id="modal-kal-tanggal" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Keterangan / Nama Kegiatan</label>
+              <input type="text" id="modal-kal-keterangan" class="form-control" placeholder="Contoh: Kerja Bakti Masal" required>
+            </div>
+          </div>
+          <div class="modal-footer bg-light d-flex justify-content-between">
+            <button type="button" id="btn-delete-kalender" class="btn btn-outline-danger btn-sm hidden" onclick="deleteKalenderConfirm()">
+              <i class="fa-solid fa-trash me-1"></i> Hapus
+            </button>
+            <div class="ms-auto">
+              <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" id="btn-save-kalender" class="btn btn-primary btn-sm px-4 fw-bold">Simpan</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6. TEMPLATE BUKTI CETAK KUITANSI TRANSAKSI ================= -->
   <div id="printable-receipt-container" class="hidden">
     <div style="max-width: 620px; margin: 0 auto; border: 2px solid #0f172a; padding: 20px; border-radius: 8px; box-sizing: border-box;">
       <div style="text-align: center; border-bottom: 2px double #0f172a; padding-bottom: 10px; margin-bottom: 15px;">
@@ -736,21 +776,25 @@
     let rawFinancialData = [];
     let currentFilteredData = [];
     let rawWargaData = [];
+    let rawKalenderData = [];
     let dashboardRawData = {};
     let dataTablesInstances = {};
     let chartAnnualInstance = null;
+    let calendarInstance = null;
 
     let modalTxBs = null;
     let modalWargaBs = null;
+    let modalKalenderBs = null;
 
     // Ambil Tahun dan Bulan Saat Ini (Default Dynamic Filter)
     const now = new Date();
     const currentYearStr = now.getFullYear().toString();
-    const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0'); // '01' - '12'
+    const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
 
     document.addEventListener("DOMContentLoaded", () => {
       modalTxBs = new bootstrap.Modal(document.getElementById('modalTx'));
       modalWargaBs = new bootstrap.Modal(document.getElementById('modalWarga'));
+      modalKalenderBs = new bootstrap.Modal(document.getElementById('modalKalender'));
       
       // Set Default Filter Tahun & Bulan Saat Ini
       document.getElementById("dash-filter-year").value = currentYearStr;
@@ -875,7 +919,6 @@
         document.getElementById("table-keuangan-title").innerText = "Riwayat Transaksi " + title;
         document.getElementById("current-sheet-target").value = tabName;
         
-        // Reset Filter Bulan & Tahun ke Bulan Ini saat Ganti Tab Keuangan
         document.getElementById("filter-tx-month").value = currentMonthStr;
         document.getElementById("filter-tx-year").value = currentYearStr;
 
@@ -892,7 +935,8 @@
         loadWargaTable();
       } else if (tabName === 'kalender') {
         document.getElementById("sec-kalender").classList.remove("hidden");
-        document.getElementById("current-page-title").innerText = "Kalender Kerja";
+        document.getElementById("current-page-title").innerText = "Kalender Kerja & Agenda RT";
+        initKalenderSection();
       } else if (tabName === 'tatatertib') {
         document.getElementById("sec-tatatertib").classList.remove("hidden");
         document.getElementById("current-page-title").innerText = "Tata Tertib Lingkungan";
@@ -911,7 +955,7 @@
       return { masuk, keluar, saldo: masuk - keluar };
     }
 
-    // INIT DASHBOARD & ANNUAL BAR CHART (JAN - DES)
+    // INIT DASHBOARD & ANNUAL BAR CHART
     async function initDashboard() {
       const year = document.getElementById("dash-filter-year").value;
       try {
@@ -1013,13 +1057,12 @@
       });
     }
 
-    // LOAD FINANCIAL DATA & CALCULATE ALL-TIME TOTALS (3 CARDS)
+    // FINANCIAL TABLE LOGIC
     async function loadFinancialTable(sheetName) {
       try {
         const res = await fetch(`${API_URL}?action=get_sheet&sheet=${sheetName}`);
         rawFinancialData = await res.json();
         
-        // 1. Hitung Akumulasi Total Keseluruhan Periode Data (All-Time)
         const totalsAll = calcTotals(rawFinancialData);
         const titleCategory = sheetName.replace('_', ' ').toUpperCase();
 
@@ -1031,7 +1074,6 @@
         document.getElementById("card-total-pengeluaran").innerText = `Rp ${totalsAll.keluar.toLocaleString('id-ID')}`;
         document.getElementById("card-saldo-akhir").innerText = `Rp ${totalsAll.saldo.toLocaleString('id-ID')}`;
 
-        // 2. Tampilkan Data Sesuai Filter Bulan/Tahun yang Aktif
         filterFinancialTable();
       } catch (err) {
         Swal.fire('Error', 'Gagal memuat data transaksi.', 'error');
@@ -1073,14 +1115,14 @@
         const isMasuk = String(jenis).toLowerCase() === 'masuk';
 
         let actionBtns = `
-          <button class="btn btn-outline-secondary btn-sm me-1" onclick="printReceipt('${id}', '${sheetName}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "'")}')" title="Cetak Kuitansi">
+          <button class="btn btn-outline-secondary btn-sm me-1" onclick="printReceipt('${id}', '${sheetName}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "\'")}')" title="Cetak Kuitansi">
             <i class="fa-solid fa-print"></i>
           </button>
         `;
 
         if (currentUser.mode.toLowerCase() === 'admin') {
           actionBtns += `
-            <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditTxModal('${id}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "'")}')" title="Edit Data">
+            <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditTxModal('${id}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "\'")}')" title="Edit Data">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
             <button class="btn btn-outline-danger btn-sm" onclick="deleteTxConfirm('${id}')" title="Hapus Data">
@@ -1101,7 +1143,6 @@
         `;
       });
 
-      // DataTables Standard Table Setup (Tanpa Tombol Bawaan)
       dataTablesInstances['keuangan'] = $('#table-keuangan').DataTable({
         language: { search: "Cari Data:", lengthMenu: "_MENU_ baris" },
         pageLength: 10,
@@ -1109,7 +1150,6 @@
       });
     }
 
-    // FUNCTION EXPORT EXCEL SEJAJAR
     function exportExcelCustom() {
       const sheetName = document.getElementById("current-sheet-target").value;
       const categoryTitle = sheetName.replace('_', ' ').toUpperCase();
@@ -1136,7 +1176,6 @@
       document.body.removeChild(link);
     }
 
-    // FUNCTION CETAK LAPORAN PROSEDURAL (DIPASTIKAN PAS 1 HALAMAN)
     function printReportDocument() {
       const sheetName = document.getElementById("current-sheet-target").value;
       const categoryTitle = sheetName.replace('_', ' ').toUpperCase();
@@ -1181,18 +1220,8 @@
         <head>
           <title>Laporan Keuangan ${categoryTitle}</title>
           <style>
-            @page {
-              size: A4 portrait;
-              margin: 12mm;
-            }
-            html, body { 
-              margin: 0; 
-              padding: 0; 
-              font-family: Arial, Helvetica, sans-serif; 
-              color: #000; 
-              background: #fff;
-              page-break-after: avoid;
-            }
+            @page { size: A4 portrait; margin: 12mm; }
+            html, body { margin: 0; padding: 0; font-family: Arial, sans-serif; color: #000; background: #fff; page-break-after: avoid; }
             .header-kop { text-align: center; border-bottom: 2px double #000; padding-bottom: 8px; margin-bottom: 15px; }
             .header-kop h2 { margin: 0; font-size: 16px; font-weight: bold; }
             .header-kop h4 { margin: 3px 0 0 0; font-size: 13px; font-weight: normal; }
@@ -1267,7 +1296,6 @@
       }, 400);
     }
 
-    // MODAL ADD / EDIT TRANSAKSI KAS
     function openAddTxModal() {
       document.getElementById("modalTxTitle").innerText = "Tambah Transaksi Baru";
       document.getElementById("modal-tx-id").value = "";
@@ -1329,7 +1357,6 @@
       }
     });
 
-    // SWEETALERT CONFIRM DELETE TRANSAKSI
     function deleteTxConfirm(id) {
       const sheetTarget = document.getElementById("current-sheet-target").value;
       Swal.fire({
@@ -1362,7 +1389,6 @@
       });
     }
 
-    // PRINT KUITANSI BUKTI TRANSAKSI (PRESISI 1 LEMBAR HANYA)
     function printReceipt(id, sheet, jenis, tanggal, nominal, keterangan) {
       document.getElementById("rec-id").innerText = id;
       document.getElementById("rec-sheet").innerText = sheet.replace('_', ' ').toUpperCase();
@@ -1378,7 +1404,247 @@
       printContainer.classList.add("hidden");
     }
 
-    // DATA WARGA TABLE & EDIT/DELETE MODAL
+    // ================= KALENDER KERJA LOGIC (FULLCALENDAR INTEGRATION) =================
+    function initKalenderSection() {
+      if (currentUser && currentUser.mode.toLowerCase() === 'admin') {
+        document.getElementById("btn-add-kalender").classList.remove("hidden");
+      } else {
+        document.getElementById("btn-add-kalender").classList.add("hidden");
+      }
+
+      loadKalenderEvents();
+    }
+
+    async function loadKalenderEvents() {
+      try {
+        const res = await fetch(`${API_URL}?action=get_kalender`);
+        rawKalenderData = await res.json();
+
+        const eventsList = rawKalenderData.map(item => ({
+          id: item.row_index,
+          title: item.keterangan,
+          start: item.tanggal,
+          allDay: true,
+          extendedProps: {
+            rowIndex: item.row_index,
+            tanggal: item.tanggal,
+            keterangan: item.keterangan
+          }
+        }));
+
+        const calendarEl = document.getElementById('calendar-container');
+
+        if (calendarInstance) {
+          calendarInstance.destroy();
+        }
+
+        calendarInstance = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          locale: 'id',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,multiMonthYear'
+          },
+          events: eventsList,
+          eventClick: function(info) {
+            if (currentUser && currentUser.mode.toLowerCase() === 'admin') {
+              const props = info.event.extendedProps;
+              openEditKalenderModal(props.rowIndex, props.tanggal, props.keterangan);
+            } else {
+              Swal.fire({
+                title: 'Detail Agenda RT',
+                html: `<b>Tanggal:</b> ${info.event.startStr}<br><b>Kegiatan:</b> ${info.event.title}`,
+                icon: 'info'
+              });
+            }
+          }
+        });
+
+        calendarInstance.render();
+
+      } catch (err) {
+        Swal.fire('Error', 'Gagal memuat data kalender kerja.', 'error');
+      }
+    }
+
+    function openAddKalenderModal() {
+      document.getElementById("modalKalenderTitle").innerText = "Tambah Agenda RT Baru";
+      document.getElementById("modal-kal-row-index").value = "";
+      document.getElementById("modal-kal-tanggal").value = new Date().toISOString().split('T')[0];
+      document.getElementById("modal-kal-keterangan").value = "";
+      document.getElementById("btn-delete-kalender").classList.add("hidden");
+      modalKalenderBs.show();
+    }
+
+    function openEditKalenderModal(rowIndex, tanggal, keterangan) {
+      document.getElementById("modalKalenderTitle").innerText = "Edit Agenda RT";
+      document.getElementById("modal-kal-row-index").value = rowIndex;
+      document.getElementById("modal-kal-tanggal").value = tanggal;
+      document.getElementById("modal-kal-keterangan").value = keterangan;
+      document.getElementById("btn-delete-kalender").classList.remove("hidden");
+      modalKalenderBs.show();
+    }
+
+    document.getElementById("form-modal-kalender").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btn-save-kalender");
+      btn.disabled = true;
+
+      const rowIndex = document.getElementById("modal-kal-row-index").value;
+      const actionType = rowIndex ? "edit_kalender" : "add_kalender";
+
+      const payload = {
+        action: actionType,
+        row_index: rowIndex,
+        tanggal: document.getElementById("modal-kal-tanggal").value,
+        keterangan: document.getElementById("modal-kal-keterangan").value
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (result.status === "success") {
+          modalKalenderBs.hide();
+          Swal.fire('Berhasil!', result.message, 'success');
+          loadKalenderEvents();
+        } else {
+          Swal.fire('Gagal!', result.message, 'error');
+        }
+      } catch (err) {
+        Swal.fire('Error!', 'Gagal menghubungi server.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function deleteKalenderConfirm() {
+      const rowIndex = document.getElementById("modal-kal-row-index").value;
+      Swal.fire({
+        title: 'Hapus Agenda Ini?',
+        text: "Data akan dihapus permanen dari jadwal.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: "delete_kalender", row_index: rowIndex })
+            });
+            const resData = await res.json();
+            if (resData.status === "success") {
+              modalKalenderBs.hide();
+              Swal.fire('Terhapus!', resData.message, 'success');
+              loadKalenderEvents();
+            }
+          } catch (err) {
+            Swal.fire('Error!', 'Gagal menghapus data.', 'error');
+          }
+        }
+      });
+    }
+
+    function printKalenderTahun() {
+      const currentYear = new Date().getFullYear();
+      const sortedData = [...rawKalenderData].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+      let tableRowsHtml = "";
+      if (sortedData.length === 0) {
+        tableRowsHtml = `<tr><td colspan="3" style="text-align: center; padding: 12px;">Belum ada agenda kegiatan yang terdaftar.</td></tr>`;
+      } else {
+        sortedData.forEach((item, index) => {
+          const d = new Date(item.tanggal);
+          const formattedTgl = d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+          tableRowsHtml += `
+            <tr>
+              <td style="text-align: center; width: 8%;">${index + 1}</td>
+              <td style="width: 35%; font-weight: bold;">${formattedTgl}</td>
+              <td>${item.keterangan}</td>
+            </tr>
+          `;
+        });
+      }
+
+      const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Agenda Kerja RT 009 Tahun ${currentYear}</title>
+          <style>
+            @page { size: A4 portrait; margin: 12mm; }
+            html, body { font-family: Arial, sans-serif; color: #000; background: #fff; margin: 0; padding: 0; }
+            .header-kop { text-align: center; border-bottom: 2px double #000; padding-bottom: 8px; margin-bottom: 15px; }
+            .header-kop h2 { margin: 0; font-size: 16px; font-weight: bold; }
+            .header-kop h4 { margin: 3px 0 0 0; font-size: 13px; font-weight: normal; }
+            .header-kop h3 { margin: 10px 0 3px 0; font-size: 14px; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+            
+            table.agenda-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+            table.agenda-table th, table.agenda-table td { border: 1px solid #000; padding: 6px 8px; }
+            table.agenda-table th { background-color: #f2f2f2; font-weight: bold; text-align: center; }
+            
+            .signature-section { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; page-break-inside: avoid; }
+            .signature-box { width: 40%; }
+            .signature-space { height: 50px; }
+            .signature-line { border-bottom: 1px solid #000; display: inline-block; width: 85%; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="header-kop">
+            <h2>PORTAL INFORMASI RUKUN TETANGGA 009 / RW 019</h2>
+            <h4>LUBANG BUAYA, SETU, KABUPATEN BEKASI</h4>
+            <h3>AGENDA & KALENDER KERJA RT TAHUN ${currentYear}</h3>
+          </div>
+
+          <table class="agenda-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Hari & Tanggal</th>
+                <th>Keterangan / Nama Kegiatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRowsHtml}
+            </tbody>
+          </table>
+
+          <div class="signature-section">
+            <div class="signature-box">
+              <p>Mengetahui,<br>Ketua RT 009 / RW 019</p>
+              <div class="signature-space"></div>
+              <p class="signature-line">( KETUA RT 009 )</p>
+            </div>
+            <div class="signature-box">
+              <p>Lubang Buaya, ${new Date().toLocaleDateString('id-ID')}<br>Sekretaris / Pengurus RT</p>
+              <div class="signature-space"></div>
+              <p class="signature-line">( ${currentUser ? currentUser.nama.toUpperCase() : 'PENGURUS RT'} )</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const printWin = window.open('', '_blank', 'width=900,height=700');
+      printWin.document.write(printHtml);
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(() => {
+        printWin.print();
+        printWin.close();
+      }, 400);
+    }
+
+    // DATA WARGA TABLE LOGIC
     async function loadWargaTable() {
       if (dataTablesInstances['warga']) {
         dataTablesInstances['warga'].destroy();
@@ -1396,7 +1662,7 @@
           let actionBtns = `-`;
           if (currentUser.mode.toLowerCase() === 'admin') {
             actionBtns = `
-              <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditWargaModal('${row.No_Rumah}', '${row.Nama.replace(/'/g, "'")}', '${row.Status}', '${row.App_Username}', '${row.App_Mode}')" title="Edit Warga">
+              <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditWargaModal('${row.No_Rumah}', '${row.Nama.replace(/'/g, "\'")}', '${row.Status}', '${row.App_Username}', '${row.App_Mode}')" title="Edit Warga">
                 <i class="fa-solid fa-user-pen"></i>
               </button>
               <button class="btn btn-outline-danger btn-sm" onclick="deleteWargaConfirm('${row.No_Rumah}')" title="Hapus Warga">
