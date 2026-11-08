@@ -1,1 +1,281 @@
-<h1>Hello World</h1>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pencatatan Keuangan RT009/009 GreenHarmoni</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .hidden { display: none !important; }
+    .card-dashboard { border: none; border-radius: 10px; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. HALAMAN LOGIN -->
+  <div id="view-login" class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-sm" style="width: 100%; max-width: 400px;">
+      <h4 class="text-center mb-1">RT009/009</h4>
+      <p class="text-center text-muted mb-4">GreenHarmoni Login</p>
+      
+      <div id="login-alert" class="alert alert-danger hidden"></div>
+      
+      <form id="form-login">
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input type="text" id="username" class="form-control" placeholder="Contoh: nanang0978" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" id="password" class="form-control" required>
+        </div>
+        <button type="submit" id="btn-login" class="btn btn-primary w-100">Masuk</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. HALAMAN DASHBOARD -->
+  <div id="view-dashboard" class="hidden">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">RT009/009 GreenHarmoni</a>
+        <div class="d-flex align-items-center text-white">
+          <span me-3 id="user-info" class="me-3"></span>
+          <button class="btn btn-outline-light btn-sm" onclick="logout()">Keluar</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container my-4">
+      <!-- Ringkasan Kas -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card card-dashboard bg-success p-3">
+            <h6>Total Pemasukan</h6>
+            <h3 id="total-masuk">Rp 0</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card card-dashboard bg-danger p-3">
+            <h6>Total Pengeluaran</h6>
+            <h3 id="total-keluar">Rp 0</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card card-dashboard bg-primary p-3">
+            <h6>Saldo Kas RT</h6>
+            <h3 id="saldo-akhir">Rp 0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Tambah Transaksi (Hanya Admin) -->
+      <div id="section-admin-input" class="card p-3 mb-4 shadow-sm hidden">
+        <h5 class="mb-3">Tambah Transaksi Kas</h5>
+        <form id="form-kas" class="row g-2">
+          <div class="col-md-2">
+            <select id="kas-jenis" class="form-select" required>
+              <option value="Masuk">Masuk</option>
+              <option value="Keluar">Keluar</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="date" id="kas-tanggal" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <input type="number" id="kas-nominal" class="form-control" placeholder="Nominal (Rp)" required>
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="kas-keterangan" class="form-control" placeholder="Keterangan" required>
+          </div>
+          <div class="col-12 text-end mt-2">
+            <button type="submit" id="btn-simpan-kas" class="btn btn-primary">Simpan Transaksi</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabel Transaksi Kas -->
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Riwayat Transaksi Kas RT</h5>
+        <div class="table-responsive">
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>ID Transaksi</th>
+                <th>Jenis</th>
+                <th>Tanggal</th>
+                <th>Nominal</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="tabel-kas-body">
+              <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // GANTI SAMA URL WEB APP APPS SCRIPT KAMU
+    const API_URL = "GANTI_DENGAN_WEB_APP_URL_APPS_SCRIPT_ANDA";
+
+    let currentUser = JSON.parse(localStorage.getItem("user_rt")) || null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAuth();
+    });
+
+    function checkAuth() {
+      if (currentUser) {
+        document.getElementById("view-login").classList.add("hidden");
+        document.getElementById("view-dashboard").classList.remove("hidden");
+        document.getElementById("user-info").innerText = `${currentUser.nama} (${currentUser.mode})`;
+        
+        if (currentUser.mode.toLowerCase() === "admin") {
+          document.getElementById("section-admin-input").classList.remove("hidden");
+        }
+        
+        // Default tanggal hari ini pada form
+        document.getElementById("kas-tanggal").value = new Date().toISOString().split('T')[0];
+        loadKasData();
+      } else {
+        document.getElementById("view-login").classList.remove("hidden");
+        document.getElementById("view-dashboard").classList.add("hidden");
+      }
+    }
+
+    // Process Login
+    document.getElementById("form-login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btn-login");
+      const alertBox = document.getElementById("login-alert");
+      
+      btn.disabled = true;
+      btn.innerText = "Memeriksa...";
+      alertBox.classList.add("hidden");
+
+      const payload = {
+        action: "login",
+        username: document.getElementById("username").value.trim(),
+        password: document.getElementById("password").value.trim()
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.status === "success") {
+          localStorage.setItem("user_rt", JSON.stringify(result.user));
+          currentUser = result.user;
+          checkAuth();
+        } else {
+          alertBox.innerText = result.message;
+          alertBox.classList.remove("hidden");
+        }
+      } catch (err) {
+        alertBox.innerText = "Terjadi kesalahan koneksi.";
+        alertBox.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Masuk";
+      }
+    });
+
+    // Load Data Transaksi & Hitung Saldo
+    async function loadKasData() {
+      const tbody = document.getElementById("tabel-kas-body");
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center">Memuat data...</td></tr>`;
+
+      try {
+        const res = await fetch(`${API_URL}?action=get_kas`);
+        const data = await res.json();
+
+        let totalMasuk = 0;
+        let totalKeluar = 0;
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center">Belum ada data transaksi.</td></tr>`;
+          return;
+        }
+
+        data.reverse().forEach(row => {
+          const nominal = Number(row.Nominal_Transaksi) || 0;
+          const isMasuk = String(row.Jenis_Transaksi).toLowerCase() === "masuk";
+
+          if (isMasuk) totalMasuk += nominal;
+          else totalKeluar += nominal;
+
+          tbody.innerHTML += `
+            <tr>
+              <td><code>${row.Transaksi_ID}</code></td>
+              <td><span class="badge ${isMasuk ? 'bg-success' : 'bg-danger'}">${row.Jenis_Transaksi}</span></td>
+              <td>${row.Tanggal_Transaksi}</td>
+              <td>Rp ${nominal.toLocaleString('id-ID')}</td>
+              <td>${row.Keterangan}</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("total-masuk").innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+        document.getElementById("total-keluar").innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
+        document.getElementById("saldo-akhir").innerText = `Rp ${(totalMasuk - totalKeluar).toLocaleString('id-ID')}`;
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>`;
+      }
+    }
+
+    // Handle Input Kas oleh Admin
+    document.getElementById("form-kas").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btn-simpan-kas");
+      btn.disabled = true;
+      btn.innerText = "Menyimpan...";
+
+      const payload = {
+        action: "add_kas",
+        jenis: document.getElementById("kas-jenis").value,
+        tanggal: document.getElementById("kas-tanggal").value,
+        nominal: document.getElementById("kas-nominal").value,
+        keterangan: document.getElementById("kas-keterangan").value
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const res = await response.json();
+
+        if (res.status === "success") {
+          alert(`Transaksi berhasil! (ID: ${res.id})`);
+          document.getElementById("form-kas").reset();
+          document.getElementById("kas-tanggal").value = new Date().toISOString().split('T')[0];
+          loadKasData();
+        } else {
+          alert("Gagal menyimpan: " + res.message);
+        }
+      } catch (err) {
+        alert("Gagal menyimpan transaksi.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Simpan Transaksi";
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem("user_rt");
+      currentUser = null;
+      checkAuth();
+    }
+  </script>
+</body>
+</html>
