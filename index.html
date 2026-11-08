@@ -3,127 +3,399 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pencatatan Keuangan RT009/009 GreenHarmoni</title>
+  <title>Sistem Keuangan & Warga RT009/009 GreenHarmoni</title>
+  
+  <!-- CSS Dependencies -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+
   <style>
-    body { background-color: #f8f9fa; }
+    :root {
+      --sidebar-width: 260px;
+      --primary-color: #0d6efd;
+      --dark-bg: #1e293b;
+    }
+    body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .hidden { display: none !important; }
-    .card-dashboard { border: none; border-radius: 10px; color: #fff; }
+
+    /* Elegant Login Page */
+    .login-wrapper {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .card-login {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+    }
+    .login-header {
+      background: #0f172a;
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    /* Layout & Sidebar Component */
+    #sidebar-wrapper {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      background: var(--dark-bg);
+      color: #94a3b8;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    #sidebar-wrapper .nav-link {
+      color: #94a3b8;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      margin: 0.2rem 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+    #sidebar-wrapper .nav-link:hover, #sidebar-wrapper .nav-link.active {
+      color: #ffffff;
+      background-color: var(--primary-color);
+    }
+    #sidebar-wrapper .submenu .nav-link {
+      padding-left: 2.8rem;
+      font-size: 0.9rem;
+    }
+
+    #page-content-wrapper {
+      margin-left: var(--sidebar-width);
+      transition: all 0.3s ease;
+    }
+
+    /* Summary Dashboard Cards */
+    .card-stat {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .card-stat:hover { transform: translateY(-3px); }
+
+    /* Responsive Mobile Handling */
+    @media (max-width: 991.98px) {
+      #sidebar-wrapper { margin-left: calc(-1 * var(--sidebar-width)); }
+      #sidebar-wrapper.show { margin-left: 0; }
+      #page-content-wrapper { margin-left: 0; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- 1. HALAMAN LOGIN -->
-  <div id="view-login" class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow-sm" style="width: 100%; max-width: 400px;">
-      <h4 class="text-center mb-1">RT009/009</h4>
-      <p class="text-center text-muted mb-4">GreenHarmoni Login</p>
-      
-      <div id="login-alert" class="alert alert-danger hidden"></div>
-      
-      <form id="form-login">
-        <div class="mb-3">
-          <label class="form-label">Username</label>
-          <input type="text" id="username" class="form-control" placeholder="Contoh: nanang0978" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Password</label>
-          <input type="password" id="password" class="form-control" required>
-        </div>
-        <button type="submit" id="btn-login" class="btn btn-primary w-100">Masuk</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- 2. HALAMAN DASHBOARD -->
-  <div id="view-dashboard" class="hidden">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">RT009/009 GreenHarmoni</a>
-        <div class="d-flex align-items-center text-white">
-          <span me-3 id="user-info" class="me-3"></span>
-          <button class="btn btn-outline-light btn-sm" onclick="logout()">Keluar</button>
-        </div>
+  <!-- ================= 1. FORM LOGIN ELEGANT ================= -->
+  <div id="view-login" class="login-wrapper">
+    <div class="card card-login">
+      <div class="login-header">
+        <i class="fa-solid fa-building-columns fa-3x mb-2 text-primary"></i>
+        <h4 class="fw-bold mb-0">GreenHarmoni</h4>
+        <small class="text-white-50">Sistem Keuangan & Data RT009/009</small>
       </div>
-    </nav>
-
-    <div class="container my-4">
-      <!-- Ringkasan Kas -->
-      <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card card-dashboard bg-success p-3">
-            <h6>Total Pemasukan</h6>
-            <h3 id="total-masuk">Rp 0</h3>
+      <div class="card-body p-4">
+        <div id="login-alert" class="alert alert-danger hidden"></div>
+        <form id="form-login" autocomplete="off">
+          <div class="mb-3">
+            <label class="form-label text-secondary fw-semibold">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="fa-solid fa-user"></i></span>
+              <input type="text" id="login-username" class="form-control" placeholder="Masukkan username" required autocomplete="off">
+            </div>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card card-dashboard bg-danger p-3">
-            <h6>Total Pengeluaran</h6>
-            <h3 id="total-keluar">Rp 0</h3>
+          <div class="mb-4">
+            <label class="form-label text-secondary fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" id="login-password" class="form-control" placeholder="Masukkan password" required autocomplete="new-password">
+            </div>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card card-dashboard bg-primary p-3">
-            <h6>Saldo Kas RT</h6>
-            <h3 id="saldo-akhir">Rp 0</h3>
-          </div>
-        </div>
-      </div>
-
-      <!-- Form Tambah Transaksi (Hanya Admin) -->
-      <div id="section-admin-input" class="card p-3 mb-4 shadow-sm hidden">
-        <h5 class="mb-3">Tambah Transaksi Kas</h5>
-        <form id="form-kas" class="row g-2">
-          <div class="col-md-2">
-            <select id="kas-jenis" class="form-select" required>
-              <option value="Masuk">Masuk</option>
-              <option value="Keluar">Keluar</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <input type="date" id="kas-tanggal" class="form-control" required>
-          </div>
-          <div class="col-md-3">
-            <input type="number" id="kas-nominal" class="form-control" placeholder="Nominal (Rp)" required>
-          </div>
-          <div class="col-md-4">
-            <input type="text" id="kas-keterangan" class="form-control" placeholder="Keterangan" required>
-          </div>
-          <div class="col-12 text-end mt-2">
-            <button type="submit" id="btn-simpan-kas" class="btn btn-primary">Simpan Transaksi</button>
-          </div>
+          <button type="submit" id="btn-login" class="btn btn-primary w-100 py-2 fw-bold">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>Masuk Aplikasi
+          </button>
         </form>
       </div>
-
-      <!-- Tabel Transaksi Kas -->
-      <div class="card p-3 shadow-sm">
-        <h5 class="mb-3">Riwayat Transaksi Kas RT</h5>
-        <div class="table-responsive">
-          <table class="table table-hover table-striped">
-            <thead>
-              <tr>
-                <th>ID Transaksi</th>
-                <th>Jenis</th>
-                <th>Tanggal</th>
-                <th>Nominal</th>
-                <th>Keterangan</th>
-              </tr>
-            </thead>
-            <tbody id="tabel-kas-body">
-              <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
   </div>
 
+  <!-- ================= 2. DASHBOARD & SIDEBAR LAYOUT ================= -->
+  <div id="view-app" class="hidden">
+    
+    <!-- Component Sidebar -->
+    <aside id="sidebar-wrapper">
+      <div class="p-3 text-white border-bottom border-secondary d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-primary fa-lg"></i>
+          <span class="fw-bold fs-6">RT009/009 App</span>
+        </div>
+        <button class="btn btn-sm btn-dark d-lg-none" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="py-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" onclick="switchTab('dashboard')">
+              <i class="fa-solid fa-chart-pie"></i><span>Dashboard</span>
+            </a>
+          </li>
+          
+          <!-- Parent Menu Keuangan -->
+          <li class="nav-item">
+            <a class="nav-link justify-content-between" data-bs-toggle="collapse" href="#menuKeuangan">
+              <span><i class="fa-solid fa-wallet"></i>Keuangan</span>
+              <i class="fa-solid fa-chevron-down fa-xs"></i>
+            </a>
+            <div class="collapse show submenu" id="menuKeuangan">
+              <a class="nav-link" href="#" onclick="switchTab('kas_rt')">KAS RT</a>
+              <a class="nav-link" href="#" onclick="switchTab('kas_pamsimas')">PAMSIMAS</a>
+              <a class="nav-link" href="#" onclick="switchTab('kas_pkk')">PKK</a>
+              <a class="nav-link" href="#" onclick="switchTab('kas_rukmat')">RUKMAT</a>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="switchTab('data_warga')">
+              <i class="fa-solid fa-users"></i><span>Data Warga</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="switchTab('kalender')">
+              <i class="fa-solid fa-calendar-days"></i><span>Kalender Kerja</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="switchTab('tatatertib')">
+              <i class="fa-solid fa-scroll"></i><span>Tata Tertib</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Content Wrapper -->
+    <div id="page-content-wrapper">
+      
+      <!-- Top Navbar Mobile/Desktop -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top px-3">
+        <div class="container-fluid p-0">
+          <button class="btn btn-light d-lg-none" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <span class="navbar-brand mb-0 h1 fs-6 text-secondary ms-2" id="current-page-title">Dashboard</span>
+          
+          <div class="ms-auto d-flex align-items-center gap-3">
+            <div class="text-end d-none d-sm-block">
+              <div class="fw-bold fs-7" id="user-display-name">Guest</div>
+              <small class="badge bg-primary-subtle text-primary" id="user-display-role">Warga</small>
+            </div>
+            <button class="btn btn-outline-danger btn-sm" onclick="logout()" title="Keluar">
+              <i class="fa-solid fa-power-off"></i> <span class="d-none d-sm-inline">Logout</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Dynamic Content -->
+      <div class="p-3 p-md-4">
+        
+        <!-- SECTION 1: DASHBOARD -->
+        <section id="sec-dashboard" class="content-section">
+          <!-- Summary Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+              <div class="card card-stat p-3 bg-white border-start border-primary border-4">
+                <small class="text-muted fw-bold">SALDO KAS RT</small>
+                <h4 class="text-primary fw-bold mb-0 mt-1" id="dash-kas-rt">Rp 0</h4>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="card card-stat p-3 bg-white border-start border-info border-4">
+                <small class="text-muted fw-bold">SALDO PAMSIMAS</small>
+                <h4 class="text-info fw-bold mb-0 mt-1" id="dash-pamsimas">Rp 0</h4>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="card card-stat p-3 bg-white border-start border-warning border-4">
+                <small class="text-muted fw-bold">SALDO PKK</small>
+                <h4 class="text-warning fw-bold mb-0 mt-1" id="dash-pkk">Rp 0</h4>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="card card-stat p-3 bg-white border-start border-success border-4">
+                <small class="text-muted fw-bold">SALDO RUKMAT</small>
+                <h4 class="text-success fw-bold mb-0 mt-1" id="dash-rukmat">Rp 0</h4>
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial Charts -->
+          <div class="row g-3">
+            <div class="col-12 col-lg-8">
+              <div class="card p-3 shadow-sm border-0">
+                <h6 class="fw-bold text-secondary mb-3">Grafik Perbandingan Arus Kas (Pemasukan vs Pengeluaran)</h6>
+                <canvas id="chartFinances" height="140"></canvas>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div class="card p-3 shadow-sm border-0">
+                <h6 class="fw-bold text-secondary mb-3">Proporsi Total Saldo</h6>
+                <canvas id="chartPieSaldo" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: DYNAMIC FINANCIAL TABLE (KAS RT, PAMSIMAS, PKK, RUKMAT) -->
+        <section id="sec-keuangan" class="content-section hidden">
+          <!-- Form Input (Hanya Mode Admin) -->
+          <div id="admin-keuangan-form" class="card p-3 shadow-sm border-0 mb-4 hidden">
+            <h6 class="fw-bold text-primary mb-3" id="form-keuangan-title">Tambah Transaksi</h6>
+            <form id="form-tx">
+              <input type="hidden" id="tx-sheet-target">
+              <div class="row g-2">
+                <div class="col-md-2">
+                  <select id="tx-jenis" class="form-select" required>
+                    <option value="Masuk">Masuk</option>
+                    <option value="Keluar">Keluar</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <input type="date" id="tx-tanggal" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                  <input type="number" id="tx-nominal" class="form-control" placeholder="Nominal (Rp)" required>
+                </div>
+                <div class="col-md-4">
+                  <input type="text" id="tx-keterangan" class="form-control" placeholder="Keterangan Rincian" required>
+                </div>
+                <div class="col-12 text-end mt-2">
+                  <button type="submit" id="btn-save-tx" class="btn btn-primary btn-sm px-4">Simpan Transaksi</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Table Container -->
+          <div class="card p-3 shadow-sm border-0">
+            <h6 class="fw-bold text-secondary mb-3" id="table-keuangan-title">Riwayat Transaksi</h6>
+            <div class="table-responsive">
+              <table id="table-keuangan" class="table table-striped table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>ID Transaksi</th>
+                    <th>Jenis</th>
+                    <th>Tanggal</th>
+                    <th>Nominal</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: DATA WARGA -->
+        <section id="sec-warga" class="content-section hidden">
+          <div class="card p-3 shadow-sm border-0">
+            <h6 class="fw-bold text-secondary mb-3">Data Registrasi Warga RT009/009</h6>
+            <div class="table-responsive">
+              <table id="table-warga" class="table table-striped table-hover w-100 fs-7">
+                <thead>
+                  <tr>
+                    <th>No Rumah</th>
+                    <th>Nama</th>
+                    <th>Status</th>
+                    <th>KK</th>
+                    <th>KTP</th>
+                    <th>Keamanan</th>
+                    <th>Kebersihan</th>
+                    <th>Kas RT</th>
+                    <th>PKK</th>
+                    <th>Rukmat</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4: KALENDER KERJA -->
+        <section id="sec-kalender" class="content-section hidden">
+          <div class="card p-4 shadow-sm border-0">
+            <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calendar-check me-2"></i>Kalender Kerja & Agenda RT</h5>
+            <div class="alert alert-info">Jadwal kegiatan rutin kerja bakti, rapat pengurus, dan posyandu lingkungan RT009/009.</div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>Kerja Bakti Masal Lingkungan</strong>
+                  <div class="small text-muted">Setiap Minggu Ke-2 & Ke-4</div>
+                </div>
+                <span class="badge bg-success rounded-pill">Rutin</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>Rapat Pleno Pengurus RT & PKK</strong>
+                  <div class="small text-muted">Setiap Malam Minggu Pertama</div>
+                </div>
+                <span class="badge bg-primary rounded-pill">Wajib</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SECTION 5: TATA TERTIB -->
+        <section id="sec-tatatertib" class="content-section hidden">
+          <div class="card p-4 shadow-sm border-0">
+            <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-book-bookmark me-2"></i>Tata Tertib Lingkungan GreenHarmoni</h5>
+            <ol class="lh-lg text-secondary">
+              <td>Tamu yang menginap lebih dari 1x24 jam wajib melapor kepada Ketua RT/Pengurus.</td>
+              <td>Iuran bulanan (Keamanan, Kebersihan, Kas RT, PKK, Rukmat) maksimal dibayarkan tanggal 10 setiap bulannya.</td>
+              <td>Kerja bakti wajib diikuti minimal 1 perwakilan dari setiap rumah.</td>
+              <td>Dilarang membuat kegaduhan yang mengganggu ketenangan tetangga di atas pukul 22.00 WIB.</td>
+            </ol>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- DataTables & Export Buttons -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
   <script>
-    // GANTI SAMA URL WEB APP APPS SCRIPT KAMU
+    // URL Backend Web App Apps Script
     const API_URL = "https://script.google.com/macros/s/AKfycbyMwaKqKY0cXrsUZkEIyA0I4Bn9QRa5xxaKiuKPuzXCcyqEnZgDLgaqsvcMZkbLV_cp4g/exec";
 
     let currentUser = JSON.parse(localStorage.getItem("user_rt")) || null;
+    let dataTablesInstances = {};
+    let chartFinances = null;
+    let chartPieSaldo = null;
 
     document.addEventListener("DOMContentLoaded", () => {
       checkAuth();
@@ -132,150 +404,300 @@
     function checkAuth() {
       if (currentUser) {
         document.getElementById("view-login").classList.add("hidden");
-        document.getElementById("view-dashboard").classList.remove("hidden");
-        document.getElementById("user-info").innerText = `${currentUser.nama} (${currentUser.mode})`;
+        document.getElementById("view-app").classList.remove("hidden");
         
-        if (currentUser.mode.toLowerCase() === "admin") {
-          document.getElementById("section-admin-input").classList.remove("hidden");
-        }
+        document.getElementById("user-display-name").innerText = currentUser.nama;
+        document.getElementById("user-display-role").innerText = currentUser.mode.toUpperCase();
         
-        // Default tanggal hari ini pada form
-        document.getElementById("kas-tanggal").value = new Date().toISOString().split('T')[0];
-        loadKasData();
+        initDashboard();
       } else {
         document.getElementById("view-login").classList.remove("hidden");
-        document.getElementById("view-dashboard").classList.add("hidden");
+        document.getElementById("view-app").classList.add("hidden");
       }
     }
 
-    // Process Login
+    // LOGIN & RESET FORM (Agar Username/Pass Tidak Tertinggal)
     document.getElementById("form-login").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("btn-login");
       const alertBox = document.getElementById("login-alert");
       
       btn.disabled = true;
-      btn.innerText = "Memeriksa...";
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i>Memeriksa...`;
       alertBox.classList.add("hidden");
 
-      const payload = {
-        action: "login",
-        username: document.getElementById("username").value.trim(),
-        password: document.getElementById("password").value.trim()
-      };
+      const formData = new URLSearchParams();
+      formData.append("action", "login");
+      formData.append("username", document.getElementById("login-username").value.trim());
+      formData.append("password", document.getElementById("login-password").value.trim());
 
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          body: JSON.stringify(payload)
-        });
+        const response = await fetch(API_URL, { method: "POST", body: formData });
         const result = await response.json();
 
         if (result.status === "success") {
           localStorage.setItem("user_rt", JSON.stringify(result.user));
           currentUser = result.user;
+          
+          // Kosongkan Form Login
+          document.getElementById("login-username").value = "";
+          document.getElementById("login-password").value = "";
+          
           checkAuth();
         } else {
           alertBox.innerText = result.message;
           alertBox.classList.remove("hidden");
         }
       } catch (err) {
-        alertBox.innerText = "Terjadi kesalahan koneksi.";
+        alertBox.innerText = "Gagal terhubung ke server.";
         alertBox.classList.remove("hidden");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Masuk";
+        btn.innerHTML = `<i class="fa-solid fa-right-to-bracket me-2"></i>Masuk Aplikasi`;
       }
     });
 
-    // Load Data Transaksi & Hitung Saldo
-    async function loadKasData() {
-      const tbody = document.getElementById("tabel-kas-body");
+    // LOGOUT SECURE CLEAR
+    function logout() {
+      localStorage.removeItem("user_rt");
+      currentUser = null;
+      document.getElementById("login-username").value = "";
+      document.getElementById("login-password").value = "";
+      checkAuth();
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar-wrapper").classList.toggle("show");
+    }
+
+    // SWITCH TAB & NAVIGASI
+    function switchTab(tabName) {
+      document.querySelectorAll(".content-section").forEach(sec => sec.classList.add("hidden"));
+      document.querySelectorAll("#sidebar-wrapper .nav-link").forEach(lnk => lnk.classList.remove("active"));
+      
+      if ($(window).width() < 992) toggleSidebar();
+
+      if (tabName === 'dashboard') {
+        document.getElementById("sec-dashboard").classList.remove("hidden");
+        document.getElementById("current-page-title").innerText = "Dashboard Overview";
+        initDashboard();
+      } else if (['kas_rt', 'kas_pamsimas', 'kas_pkk', 'kas_rukmat'].includes(tabName)) {
+        document.getElementById("sec-keuangan").classList.remove("hidden");
+        const title = tabName.replace('_', ' ').toUpperCase();
+        document.getElementById("current-page-title").innerText = "Keuangan - " + title;
+        document.getElementById("table-keuangan-title").innerText = "Riwayat Transaksi " + title;
+        document.getElementById("tx-sheet-target").value = tabName;
+        
+        if (currentUser.mode.toLowerCase() === 'admin') {
+          document.getElementById("admin-keuangan-form").classList.remove("hidden");
+          document.getElementById("form-keuangan-title").innerText = "Tambah Transaksi " + title;
+          document.getElementById("tx-tanggal").value = new Date().toISOString().split('T')[0];
+        } else {
+          document.getElementById("admin-keuangan-form").classList.add("hidden");
+        }
+        
+        loadFinancialTable(tabName);
+      } else if (tabName === 'data_warga') {
+        document.getElementById("sec-warga").classList.remove("hidden");
+        document.getElementById("current-page-title").innerText = "Data Warga RT";
+        loadWargaTable();
+      } else if (tabName === 'kalender') {
+        document.getElementById("sec-kalender").classList.remove("hidden");
+        document.getElementById("current-page-title").innerText = "Kalender Kerja";
+      } else if (tabName === 'tatatertib') {
+        document.getElementById("sec-tatatertib").classList.remove("hidden");
+        document.getElementById("current-page-title").innerText = "Tata Tertib Lingkungan";
+      }
+    }
+
+    // CALCULATE SALDO & CARDS
+    function calcTotals(rows) {
+      let masuk = 0, keluar = 0;
+      rows.forEach(r => {
+        const nom = Number(r.Nominal_Transaksi || r.Nominal) || 0;
+        const jns = String(r.Jenis_Transaksi || r.Jenis || '').toLowerCase();
+        if (jns === 'masuk') masuk += nom;
+        else if (jns === 'keluar') keluar += nom;
+      });
+      return { masuk, keluar, saldo: masuk - keluar };
+    }
+
+    // DASHBOARD & CHARTS
+    async function initDashboard() {
+      try {
+        const res = await fetch(`${API_URL}?action=get_dashboard`);
+        const data = await res.json();
+
+        const statRT = calcTotals(data.kas_rt || []);
+        const statPam = calcTotals(data.pamsimas || []);
+        const statPkk = calcTotals(data.pkk || []);
+        const statRuk = calcTotals(data.rukmat || []);
+
+        document.getElementById("dash-kas-rt").innerText = `Rp ${statRT.saldo.toLocaleString('id-ID')}`;
+        document.getElementById("dash-pamsimas").innerText = `Rp ${statPam.saldo.toLocaleString('id-ID')}`;
+        document.getElementById("dash-pkk").innerText = `Rp ${statPkk.saldo.toLocaleString('id-ID')}`;
+        document.getElementById("dash-rukmat").innerText = `Rp ${statRuk.saldo.toLocaleString('id-ID')}`;
+
+        renderCharts(statRT, statPam, statPkk, statRuk);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderCharts(rt, pam, pkk, ruk) {
+      if (chartFinances) chartFinances.destroy();
+      if (chartPieSaldo) chartPieSaldo.destroy();
+
+      const ctxBar = document.getElementById('chartFinances').getContext('2d');
+      chartFinances = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: ['KAS RT', 'PAMSIMAS', 'PKK', 'RUKMAT'],
+          datasets: [
+            { label: 'Pemasukan', data: [rt.masuk, pam.masuk, pkk.masuk, ruk.masuk], backgroundColor: '#0d6efd' },
+            { label: 'Pengeluaran', data: [rt.keluar, pam.keluar, pkk.keluar, ruk.keluar], backgroundColor: '#dc3545' }
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+
+      const ctxPie = document.getElementById('chartPieSaldo').getContext('2d');
+      chartPieSaldo = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+          labels: ['KAS RT', 'PAMSIMAS', 'PKK', 'RUKMAT'],
+          datasets: [{
+            data: [rt.saldo, pam.saldo, pkk.saldo, ruk.saldo],
+            backgroundColor: ['#0d6efd', '#0dcaf0', '#ffc107', '#198754']
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    // DATATABLE FINANCIAL KAS (WITH EXPORT EXCEL & PRINT)
+    async function loadFinancialTable(sheetName) {
+      if (dataTablesInstances['keuangan']) {
+        dataTablesInstances['keuangan'].destroy();
+      }
+
+      const tbody = document.querySelector("#table-keuangan tbody");
       tbody.innerHTML = `<tr><td colspan="5" class="text-center">Memuat data...</td></tr>`;
 
       try {
-        const res = await fetch(`${API_URL}?action=get_kas`);
+        const res = await fetch(`${API_URL}?action=get_sheet&sheet=${sheetName}`);
         const data = await res.json();
 
-        let totalMasuk = 0;
-        let totalKeluar = 0;
         tbody.innerHTML = "";
-
-        if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center">Belum ada data transaksi.</td></tr>`;
-          return;
-        }
-
-        data.reverse().forEach(row => {
-          const nominal = Number(row.Nominal_Transaksi) || 0;
-          const isMasuk = String(row.Jenis_Transaksi).toLowerCase() === "masuk";
-
-          if (isMasuk) totalMasuk += nominal;
-          else totalKeluar += nominal;
+        data.forEach(row => {
+          const id = row.Transaksi_ID || row.ID || row.Id || '-';
+          const jenis = row.Jenis_Transaksi || row.Jenis || 'Masuk';
+          const tgl = row.Tanggal_Transaksi || row.Tanggal || '-';
+          const nom = Number(row.Nominal_Transaksi || row.Nominal) || 0;
+          const ket = row.Keterangan || '-';
+          const isMasuk = String(jenis).toLowerCase() === 'masuk';
 
           tbody.innerHTML += `
             <tr>
-              <td><code>${row.Transaksi_ID}</code></td>
-              <td><span class="badge ${isMasuk ? 'bg-success' : 'bg-danger'}">${row.Jenis_Transaksi}</span></td>
-              <td>${row.Tanggal_Transaksi}</td>
-              <td>Rp ${nominal.toLocaleString('id-ID')}</td>
-              <td>${row.Keterangan}</td>
+              <td><code>${id}</code></td>
+              <td><span class="badge ${isMasuk ? 'bg-success':'bg-danger'}">${jenis}</span></td>
+              <td>${tgl}</td>
+              <td>Rp ${nom.toLocaleString('id-ID')}</td>
+              <td>${ket}</td>
             </tr>
           `;
         });
 
-        document.getElementById("total-masuk").innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
-        document.getElementById("total-keluar").innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
-        document.getElementById("saldo-akhir").innerText = `Rp ${(totalMasuk - totalKeluar).toLocaleString('id-ID')}`;
+        dataTablesInstances['keuangan'] = $('#table-keuangan').DataTable({
+          dom: 'Bfrtip',
+          buttons: ['excel', 'print'],
+          language: { search: "Cari Data:", lengthMenu: "_MENU_ data per halaman" },
+          pageLength: 10,
+          responsive: true
+        });
 
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>`;
       }
     }
 
-    // Handle Input Kas oleh Admin
-    document.getElementById("form-kas").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById("btn-simpan-kas");
-      btn.disabled = true;
-      btn.innerText = "Menyimpan...";
+    // DATATABLE WARGA
+    async function loadWargaTable() {
+      if (dataTablesInstances['warga']) {
+        dataTablesInstances['warga'].destroy();
+      }
 
-      const payload = {
-        action: "add_kas",
-        jenis: document.getElementById("kas-jenis").value,
-        tanggal: document.getElementById("kas-tanggal").value,
-        nominal: document.getElementById("kas-nominal").value,
-        keterangan: document.getElementById("kas-keterangan").value
-      };
+      const tbody = document.querySelector("#table-warga tbody");
+      tbody.innerHTML = `<tr><td colspan="12" class="text-center">Memuat data warga...</td></tr>`;
 
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          body: JSON.stringify(payload)
-        });
-        const res = await response.json();
+        const res = await fetch(`${API_URL}?action=get_sheet&sheet=data_warga`);
+        const data = await res.json();
 
-        if (res.status === "success") {
-          alert(`Transaksi berhasil! (ID: ${res.id})`);
-          document.getElementById("form-kas").reset();
-          document.getElementById("kas-tanggal").value = new Date().toISOString().split('T')[0];
-          loadKasData();
+        tbody.innerHTML = "";
+        data.forEach(row => {
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${row.No_Rumah}</strong></td>
+              <td>${row.Nama}</td>
+              <td>${row.Status}</td>
+              <td>${row.Data_KK}</td>
+              <td>${row.Data_Ktp}</td>
+              <td>${row.Iuran_Keamanan}</td>
+              <td>${row.Iuran_Kebersihan}</td>
+              <td>${row.Iuran_KasRT}</td>
+              <td>${row.Iuran_PKK}</td>
+              <td>${row.Iuran_Rukmat}</td>
+              <td>${row.App_Username}</td>
+              <td><span class="badge bg-secondary">${row.App_Mode}</span></td>
+            </tr>
+          `;
+        });
+
+        dataTablesInstances['warga'] = $('#table-warga').DataTable({
+          dom: 'Bfrtip',
+          buttons: ['excel', 'print'],
+          language: { search: "Cari Warga:" },
+          pageLength: 10,
+          responsive: true
+        });
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center text-danger">Gagal memuat data warga.</td></tr>`;
+      }
+    }
+
+    // SIMPAN TRANSAKSI KEUANGAN
+    document.getElementById("form-tx").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btn-save-tx");
+      btn.disabled = true;
+
+      const formData = new URLSearchParams();
+      formData.append("action", "add_keuangan");
+      formData.append("sheet_target", document.getElementById("tx-sheet-target").value);
+      formData.append("jenis", document.getElementById("tx-jenis").value);
+      formData.append("tanggal", document.getElementById("tx-tanggal").value);
+      formData.append("nominal", document.getElementById("tx-nominal").value);
+      formData.append("keterangan", document.getElementById("tx-keterangan").value);
+
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: formData });
+        const result = await res.json();
+
+        if (result.status === "success") {
+          alert(`Transaksi berhasil disimpan dengan ID: ${result.id}`);
+          document.getElementById("form-tx").reset();
+          loadFinancialTable(document.getElementById("tx-sheet-target").value);
         } else {
-          alert("Gagal menyimpan: " + res.message);
+          alert("Gagal: " + result.message);
         }
       } catch (err) {
-        alert("Gagal menyimpan transaksi.");
+        alert("Terjadi kesalahan saat menyimpan data.");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Simpan Transaksi";
       }
     });
-
-    function logout() {
-      localStorage.removeItem("user_rt");
-      currentUser = null;
-      checkAuth();
-    }
   </script>
 </body>
 </html>
