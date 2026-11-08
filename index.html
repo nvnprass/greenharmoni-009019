@@ -9,7 +9,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <!-- Menambahkan SheetJS untuk Export Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     :root { --sidebar-width: 280px; --sidebar-collapsed-width: 75px; --primary-color: #0d6efd; --dark-bg: #0f172a; }
@@ -93,7 +96,6 @@
         <ul class="nav flex-column">
           <li class="nav-item"><a class="nav-link active" href="#" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie fa-fw"></i><span class="link-text">Dashboard</span></a></li>
           
-          <!-- Keuangan Menu -->
           <li class="nav-item">
             <a class="nav-link justify-content-between" data-bs-toggle="collapse" href="#menuKeuangan">
               <div class="d-flex align-items-center gap-3"><i class="fa-solid fa-wallet fa-fw"></i><span class="link-text">Keuangan</span></div>
@@ -101,7 +103,6 @@
             </a>
             <div class="collapse show submenu" id="menuKeuangan">
               <a class="nav-link" href="#" onclick="switchTab('kas_rt')"><span class="link-text">KAS RT</span></a>
-              <!-- PAMSIMAS Sub -->
               <a class="nav-link justify-content-between" data-bs-toggle="collapse" href="#menuPamsimas">
                 <span class="link-text"><i class="fa-solid fa-faucet-drip me-2"></i>PAMSIMAS</span>
                 <i class="fa-solid fa-chevron-down fa-xs chevron-icon"></i>
@@ -173,15 +174,56 @@
         <!-- PEMBAYARAN PAMSIMAS -->
         <section id="sec-pembayaran-pamsimas" class="content-section hidden">
           <div class="card p-3 shadow-sm border-0">
-            <div class="d-flex justify-content-between mb-3">
-              <h5 class="fw-bold">Data Pembayaran PAMSIMAS</h5>
-              <select id="filter-pam-periode" class="form-select form-select-sm w-auto" onchange="loadPembayaranPamsimasTable()">
-                <option value="2026-11">2026-11</option><option value="2026-10">2026-10</option>
-              </select>
+            
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 border-bottom pb-3">
+              <h5 class="fw-bold mb-0">Data Pembayaran PAMSIMAS</h5>
+              <div class="d-flex gap-2">
+                <button class="btn btn-success btn-sm fw-bold" onclick="exportPamExcel()"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
+                <button class="btn btn-dark btn-sm fw-bold" onclick="printPamData()"><i class="fa-solid fa-print me-1"></i> Print Laporan</button>
+              </div>
             </div>
+
+            <!-- PERBAIKAN FILTER BULAN & TAHUN -->
+            <div class="row g-2 mb-3 bg-light p-2 rounded">
+              <div class="col-6 col-md-3">
+                <label class="form-label fs-7 fw-bold mb-1">Filter Bulan:</label>
+                <select id="filter-pam-month" class="form-select form-select-sm" onchange="loadPembayaranPamsimasTable()">
+                  <option value="01">Januari</option>
+                  <option value="02">Februari</option>
+                  <option value="03">Maret</option>
+                  <option value="04">April</option>
+                  <option value="05">Mei</option>
+                  <option value="06">Juni</option>
+                  <option value="07">Juli</option>
+                  <option value="08">Agustus</option>
+                  <option value="09">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label fs-7 fw-bold mb-1">Filter Tahun:</label>
+                <select id="filter-pam-year" class="form-select form-select-sm" onchange="loadPembayaranPamsimasTable()">
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2025">2025</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- PERBAIKAN KOLOM TABEL DIRAMPINGKAN -->
             <div class="table-responsive">
               <table id="table-pembayaran-pamsimas" class="table table-hover align-middle w-100 fs-7">
-                <thead class="table-light"><tr><th>No Pembayaran</th><th>Rumah</th><th>Nama</th><th>Periode</th><th>Tipe</th><th>Status</th><th>Meter (Awal-Akhir)</th><th>Nominal</th><th>Aksi</th></tr></thead>
+                <thead class="table-light">
+                  <tr>
+                    <th>No Rumah</th>
+                    <th>Nama Warga</th>
+                    <th>Periode</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
                 <tbody></tbody>
               </table>
             </div>
@@ -228,7 +270,7 @@
             <div class="col-md-6"><label>No Pembayaran</label><input type="text" id="modal-pam-no" class="form-control bg-light" readonly placeholder="Auto-Generate"></div>
             <div class="col-md-6"><label>No Rumah</label><select id="modal-pam-norumah" class="form-select" onchange="autoCompletePamWarga()"></select></div>
             <div class="col-md-6"><label>Nama</label><input type="text" id="modal-pam-nama" class="form-control bg-light" readonly></div>
-            <div class="col-md-6"><label>Periode</label><input type="month" id="modal-pam-periode" class="form-control" required value="2026-11"></div>
+            <div class="col-md-6"><label>Periode</label><input type="month" id="modal-pam-periode" class="form-control" required></div>
             <div class="col-md-6"><label>Tipe</label><select id="modal-pam-tipe" class="form-select" onchange="togglePamTypeFields()"><option value="Flat">Flat</option><option value="Meteran">Meteran</option></select></div>
             <div class="col-md-6"><label>Status</label><select id="modal-pam-status" class="form-select text-uppercase"><option value="Belum" class="text-danger">Belum Lunas</option><option value="Lunas" class="text-success">Lunas</option></select></div>
             
@@ -319,10 +361,19 @@
     let modalTxBs, modalPamBs, modalWargaBs;
     let calendar;
 
+    // Set Default Filter Bulan & Tahun saat load
+    const today = new Date();
+    const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+    const currentYear = today.getFullYear().toString();
+
     document.addEventListener("DOMContentLoaded", () => {
       modalTxBs = new bootstrap.Modal(document.getElementById('modalTx'));
       modalPamBs = new bootstrap.Modal(document.getElementById('modalPam'));
       modalWargaBs = new bootstrap.Modal(document.getElementById('modalWarga'));
+      
+      document.getElementById("filter-pam-month").value = currentMonth;
+      document.getElementById("filter-pam-year").value = currentYear;
+
       checkAuth();
     });
 
@@ -333,7 +384,6 @@
         document.getElementById("user-display-name").innerText = currentUser.nama;
         document.getElementById("user-display-role").innerText = currentUser.mode.toUpperCase();
         
-        // Show/hide admin buttons
         const isAdmin = ['admin', 'superadmin'].includes(currentUser.mode.toLowerCase());
         document.getElementById("btn-open-add-modal").classList.toggle("hidden", !isAdmin);
         document.getElementById("btn-add-warga").classList.toggle("hidden", currentUser.mode.toLowerCase() !== 'superadmin');
@@ -396,7 +446,6 @@
       $("#dash-pkk").text("Rp " + sum(dashboardRawData.kas_pkk).toLocaleString());
       $("#dash-rukmat").text("Rp " + sum(dashboardRawData.kas_rukmat).toLocaleString());
 
-      // Simple Chart
       if(chartInst) chartInst.destroy();
       chartInst = new Chart(document.getElementById('chartAnnualFinances'), {
         type: 'bar',
@@ -407,13 +456,13 @@
       });
     }
 
-    // PAMSIMAS
+    // PAMSIMAS LOGIC
     async function loadWargaOptionsForPam() {
       const res = await fetch(`${API_URL}?action=get_sheet&sheet=data_warga`);
       rawWargaData = await res.json();
       let sel = $("#modal-pam-norumah"); sel.html('<option value="">-- Pilih --</option>');
       rawWargaData.forEach(w => {
-         let noR = w.No_Rumah || w["Blok No - Rumah"]; // fallback dynamic
+         let noR = w.No_Rumah || w["Blok No - Rumah"];
          if(noR) sel.append(`<option value="${noR}">${noR} - ${w.Nama}</option>`);
       });
     }
@@ -438,26 +487,127 @@
     }
 
     async function loadPembayaranPamsimasTable() {
-      const prd = $("#filter-pam-periode").val();
+      // Gabungkan Bulan dan Tahun menjadi format YYYY-MM
+      const y = $("#filter-pam-year").val();
+      const m = $("#filter-pam-month").val();
+      const prd = y + "-" + m; 
+      
       const res = await fetch(`${API_URL}?action=get_pembayaran_pamsimas&periode=${prd}`);
-      const data = await res.json();
+      rawPamData = await res.json();
+      
       if(dataTablesInstances['pam']) dataTablesInstances['pam'].destroy();
       
       let tbody = $("#table-pembayaran-pamsimas tbody").empty();
-      data.forEach(r => {
+      rawPamData.forEach(r => {
         let isLunas = String(r.Status).toLowerCase() === 'lunas';
-        let ms = r.Tipe === 'Meteran' ? `${r.Meter_Awal}-${r.Meter_Akhir}` : '-';
-        let btn = `<button class="btn btn-sm btn-primary" onclick="openEditPam('${r.No_Pembayaran}','${r.No_Rumah}','${r.Nama}','${r.Periode}','${r.Tipe}','${r.Status}',${r.Meter_Awal},${r.Meter_Akhir},${r.Meter_Tarif},${r.Biaya_Beban},${r.Nominal},'${r.Metode_Pembayaran}','${r.Keterangan}')">Edit / Bayar</button>`;
-        if(isLunas) btn += ` <button class="btn btn-sm btn-secondary" onclick="printR('${r.No_Pembayaran}','PAMSIMAS',${r.Nominal},'Pembayaran Air ${r.Periode}')"><i class="fa-solid fa-print"></i></button>`;
         
-        tbody.append(`<tr><td>${r.No_Pembayaran||'-'}</td><td>${r.No_Rumah}</td><td>${r.Nama}</td><td>${r.Periode}</td><td>${r.Tipe}</td><td><span class="badge ${isLunas?'bg-success':'bg-danger'}">${r.Status}</span></td><td>${ms}</td><td>Rp ${Number(r.Nominal).toLocaleString()}</td><td>${btn}</td></tr>`);
+        // PERBAIKAN: HANYA TAMPILKAN LOGO DI KOLOM AKSI
+        let btn = `<button class="btn btn-sm btn-outline-primary me-1" onclick="openEditPam('${r.No_Pembayaran}','${r.No_Rumah}','${r.Nama}','${r.Periode}','${r.Tipe}','${r.Status}',${r.Meter_Awal},${r.Meter_Akhir},${r.Meter_Tarif},${r.Biaya_Beban},${r.Nominal},'${r.Metode_Pembayaran}','${r.Keterangan}')" title="Edit / Bayar"><i class="fa-solid fa-pen"></i></button>`;
+        
+        if(isLunas) {
+           btn += `<button class="btn btn-sm btn-outline-secondary" onclick="printR('${r.No_Pembayaran}','PAMSIMAS',${r.Nominal},'Pembayaran Air ${r.Periode}')" title="Print Kwitansi"><i class="fa-solid fa-print"></i></button>`;
+        }
+        
+        // PERBAIKAN: KOLOM TABEL DIRAMPINGKAN
+        tbody.append(`<tr>
+          <td><strong>${r.No_Rumah}</strong></td>
+          <td>${r.Nama}</td>
+          <td>${r.Periode}</td>
+          <td><span class="badge ${isLunas?'bg-success':'bg-danger'}">${r.Status}</span></td>
+          <td class="text-center">${btn}</td>
+        </tr>`);
       });
       dataTablesInstances['pam'] = $('#table-pembayaran-pamsimas').DataTable({responsive:true});
     }
 
+    // PERBAIKAN: EXPORT EXCEL KHUSUS PAMSIMAS
+    function exportPamExcel() {
+      if (!rawPamData || rawPamData.length === 0) {
+        Swal.fire("Data Kosong", "Tidak ada data untuk diekspor pada periode ini.", "warning");
+        return;
+      }
+      
+      let exportData = rawPamData.map(r => ({
+          "No Pembayaran": r.No_Pembayaran,
+          "No Rumah": r.No_Rumah,
+          "Nama Warga": r.Nama,
+          "Periode": r.Periode,
+          "Tipe": r.Tipe,
+          "Status": r.Status,
+          "Meter Awal": r.Meter_Awal,
+          "Meter Akhir": r.Meter_Akhir,
+          "Tarif/M": r.Meter_Tarif,
+          "Biaya Beban": r.Biaya_Beban,
+          "Nominal": r.Nominal,
+          "Metode": r.Metode_Pembayaran,
+          "Keterangan": r.Keterangan
+      }));
+
+      let wb = XLSX.utils.book_new();
+      let ws = XLSX.utils.json_to_sheet(exportData);
+      
+      // Auto width untuk Excel
+      const wscols = [{wch:15}, {wch:10}, {wch:20}, {wch:10}, {wch:10}, {wch:10}, {wch:10}, {wch:10}, {wch:10}, {wch:12}, {wch:15}, {wch:15}, {wch:25}];
+      ws['!cols'] = wscols;
+
+      XLSX.utils.book_append_sheet(wb, ws, "Rekap_Pamsimas");
+      let prd = $("#filter-pam-year").val() + "-" + $("#filter-pam-month").val();
+      XLSX.writeFile(wb, `Data_Pembayaran_PAMSIMAS_${prd}.xlsx`);
+    }
+
+    // PERBAIKAN: PRINT DATA TABEL LENGKAP PAMSIMAS
+    function printPamData() {
+      if (!rawPamData || rawPamData.length === 0) return;
+      let prd = $("#filter-pam-year").val() + "-" + $("#filter-pam-month").val();
+      
+      let printContents = `
+        <h3 style="text-align:center; font-family:sans-serif;">Laporan Data Pembayaran PAMSIMAS</h3>
+        <p style="text-align:center; font-family:sans-serif;">Periode: <strong>${prd}</strong></p>
+        <table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse; font-family:sans-serif; font-size:12px;">
+            <thead style="background-color: #f8f9fa;">
+                <tr>
+                    <th>No Pembayaran</th>
+                    <th>No Rumah</th>
+                    <th>Nama</th>
+                    <th>Periode</th>
+                    <th>Tipe</th>
+                    <th>Status</th>
+                    <th>Nominal Total (Rp)</th>
+                    <th>Metode</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rawPamData.map(r => `
+                    <tr>
+                        <td>${r.No_Pembayaran || '-'}</td>
+                        <td><strong>${r.No_Rumah}</strong></td>
+                        <td>${r.Nama}</td>
+                        <td>${r.Periode}</td>
+                        <td>${r.Tipe}</td>
+                        <td>${r.Status}</td>
+                        <td>Rp ${Number(r.Nominal).toLocaleString('id-ID')}</td>
+                        <td>${r.Metode_Pembayaran}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <p style="text-align:right; font-family:sans-serif; font-size:10px; margin-top:20px;">Dicetak otomatis oleh Sistem RT 009</p>
+      `;
+      let w = window.open('', '_blank');
+      w.document.write('<html><head><title>Print Laporan PAMSIMAS</title></head><<body>' + printContents + '</body></html>');
+      w.document.close();
+      w.print();
+    }
+
     function openEditPam(no, nor, nm, prd, tp, st, ma, mk, mt, mb, nom, met, ket) {
       $("#modal-pam-no").val(no||''); $("#modal-pam-norumah").val(nor); $("#modal-pam-nama").val(nm);
-      $("#modal-pam-periode").val(prd||'2026-11'); $("#modal-pam-tipe").val(tp||'Flat'); $("#modal-pam-status").val(st||'Belum');
+      
+      // Ambil periode dari filter saat tombol ditekan
+      const y = $("#filter-pam-year").val();
+      const m = $("#filter-pam-month").val();
+      $("#modal-pam-periode").val(prd || (y + "-" + m)); 
+
+      $("#modal-pam-tipe").val(tp||'Flat'); $("#modal-pam-status").val(st||'Belum');
       $("#modal-pam-m-awal").val(ma||0); $("#modal-pam-m-akhir").val(mk||0); $("#modal-pam-m-tarif").val(mt||3500); $("#modal-pam-m-beban").val(mb||10000);
       $("#modal-pam-nominal").val(nom||0); $("#modal-pam-metode").val(met||'Transfer Bank'); $("#modal-pam-keterangan").val(ket||'');
       togglePamTypeFields(); modalPamBs.show();
@@ -479,8 +629,8 @@
       let tbody = $("#table-keuangan tbody").empty();
       const isAdmin = ['admin', 'superadmin'].includes(currentUser.mode.toLowerCase());
       data.forEach(r => {
-        let btn = `<button class="btn btn-sm btn-secondary" onclick="printR('${r.Transaksi_ID}','${sheet}',${r.Nominal_Transaksi},'${r.Keterangan}')"><i class="fa-solid fa-print"></i></button>`;
-        if (isAdmin) btn += ` <button class="btn btn-sm btn-info" onclick="openAddTxModal('${r.Transaksi_ID}','${r.Jenis_Transaksi}','${r.Tanggal_Transaksi}',${r.Nominal_Transaksi},'${r.Keterangan}')"><i class="fa-solid fa-pen"></i></button>`;
+        let btn = `<button class="btn btn-sm btn-outline-secondary" onclick="printR('${r.Transaksi_ID}','${sheet}',${r.Nominal_Transaksi},'${r.Keterangan}')"><i class="fa-solid fa-print"></i></button>`;
+        if (isAdmin) btn += ` <button class="btn btn-sm btn-outline-info" onclick="openAddTxModal('${r.Transaksi_ID}','${r.Jenis_Transaksi}','${r.Tanggal_Transaksi}',${r.Nominal_Transaksi},'${r.Keterangan}')"><i class="fa-solid fa-pen"></i></button>`;
         tbody.append(`<tr><td>${r.Transaksi_ID||'-'}</td><td><span class="badge ${r.Jenis_Transaksi==='Masuk'?'bg-success':'bg-danger'}">${r.Jenis_Transaksi}</span></td><td>${r.Tanggal_Transaksi}</td><td>Rp ${Number(r.Nominal_Transaksi||0).toLocaleString()}</td><td>${r.Keterangan}</td><td class="text-center">${btn}</td></tr>`);
       });
       dataTablesInstances['kas'] = $('#table-keuangan').DataTable({responsive:true});
@@ -509,7 +659,7 @@
       data.forEach(r => {
         let no = r.No_Rumah || r["Blok No - Rumah"] || '-';
         let role = r.App_Mode || r.Role || r.Level || 'warga';
-        let btn = isSuper ? `<button class="btn btn-sm btn-warning" onclick="openWargaModal('${no}','${r.Nama}','${r.Status}','${r.App_Username||r.Username||''}','${r.App_Password||r.Password||''}','${role}')"><i class="fa-solid fa-pen"></i></button>` : '-';
+        let btn = isSuper ? `<button class="btn btn-sm btn-outline-warning" onclick="openWargaModal('${no}','${r.Nama}','${r.Status}','${r.App_Username||r.Username||''}','${r.App_Password||r.Password||''}','${role}')"><i class="fa-solid fa-pen"></i></button>` : '-';
         tbody.append(`<tr><td>${no}</td><td>${r.Nama}</td><td>${r.Status}</td><td>${r.Data_KK||'-'}</td><td>${r.Data_Ktp||'-'}</td><td><span class="badge bg-secondary">${role}</span></td><td class="text-center">${btn}</td></tr>`);
       });
       dataTablesInstances['warga'] = $('#table-warga').DataTable({responsive:true});
@@ -528,7 +678,7 @@
       if(out.status==="success") { Swal.fire('Berhasil', out.message, 'success'); modalWargaBs.hide(); loadWargaTable(); }
     });
 
-    // PRINT & CALENDAR
+    // PRINT KUITANSI KECIL
     function printR(id, sheet, nom, ket) {
       $("#rec-id").text(id); $("#rec-sheet").text(sheet.toUpperCase()); $("#rec-nominal").text("Rp " + Number(nom).toLocaleString()); $("#rec-keterangan").text(ket);
       $("#printable-receipt-container").removeClass("hidden"); window.print(); $("#printable-receipt-container").addClass("hidden");
