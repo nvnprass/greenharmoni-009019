@@ -6,12 +6,8 @@
   <meta name="theme-color" content="#eef5f7">
   <title>Sistem Informasi RT009/019</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
   <style>
     :root {
@@ -36,10 +32,10 @@
       margin: 0;
       background: var(--canvas);
       color: var(--ink);
-      font-family: "DM Sans", sans-serif;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
       font-size: 14px;
     }
-    h1,h2,h3,h4,h5,.brand-name,.page-title { font-family: "Plus Jakarta Sans", sans-serif; }
+    h1,h2,h3,h4,h5,.brand-name,.page-title { font-family: Inter, "Segoe UI", system-ui, sans-serif; }
     button, input, select, textarea { font: inherit; }
     .hidden { display: none !important; }
 
@@ -173,7 +169,7 @@
     .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .stat-label { color: #87969d; font-size: 11px; font-weight: 700; }
     .stat-icon { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; font-size: 16px; }
-    .stat-value { font-family: "Plus Jakarta Sans", sans-serif; font-size: clamp(17px, 1.8vw, 23px); font-weight: 800; letter-spacing: -.04em; margin-top: 14px; overflow-wrap: anywhere; }
+    .stat-value { font-family: Inter, "Segoe UI", system-ui, sans-serif; font-size: clamp(17px, 1.8vw, 23px); font-weight: 800; letter-spacing: -.04em; margin-top: 14px; overflow-wrap: anywhere; }
     .stat-caption { color: #a2adb2; font-size: 10px; margin-top: 5px; }
     .tone-teal .stat-icon { background: var(--primary-soft); color: #3d8586; }
     .tone-blue .stat-icon { background: var(--blue-soft); color: #5b8fc3; }
@@ -181,7 +177,7 @@
     .tone-purple .stat-icon { background: var(--purple-soft); color: #8a79b7; }
     .panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
     .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 19px 21px; border-bottom: 1px solid #edf1f2; }
-    .panel-title { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: 14px; margin: 0; }
+    .panel-title { font-family: Inter, "Segoe UI", system-ui, sans-serif; font-weight: 800; font-size: 14px; margin: 0; }
     .panel-subtitle { color: #9aa7ad; font-size: 11px; margin-top: 4px; }
     .panel-body { padding: 18px 21px; }
     .chart-wrap { height: 340px; position: relative; }
@@ -209,17 +205,42 @@
     .calendar-panel { padding: 18px; }
     #calendar { min-height: 650px; }
     .fc { --fc-border-color: #edf1f2; --fc-button-bg-color: #fff; --fc-button-border-color: #e1e9eb; --fc-button-text-color: #637781; --fc-button-hover-bg-color: #eef6f5; --fc-button-hover-border-color: #c6dfdd; --fc-button-active-bg-color: #e2f0ef; --fc-button-active-border-color: #b7d6d3; --fc-today-bg-color: #f0f8f7; }
-    .fc .fc-toolbar-title { font-family: "Plus Jakarta Sans", sans-serif; font-size: 17px; font-weight: 800; color: #344b55; }
+    .fc .fc-toolbar-title { font-family: Inter, "Segoe UI", system-ui, sans-serif; font-size: 17px; font-weight: 800; color: #344b55; }
     .fc .fc-button { text-transform: none; font-size: 11px; font-weight: 700; border-radius: 8px !important; box-shadow: none !important; }
     .fc .fc-daygrid-day-number { color: #667b84; font-size: 11px; text-decoration: none; }
     .fc .fc-col-header-cell-cushion { color: #84939a; font-size: 10px; text-decoration: none; text-transform: uppercase; }
-    .fc .fc-event { border: 0; background: #e5f2f0; color: #347a77; border-radius: 5px; padding: 2px 4px; font-size: 10px; cursor: pointer; }
+    .fc .fc-event,
+    .fc .fc-daygrid-event,
+    .fc .fc-timegrid-event {
+      border: 1px solid #195862 !important;
+      background: #216b75 !important;
+      color: #ffffff !important;
+      border-radius: 6px;
+      padding: 3px 5px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(18, 62, 69, .12);
+    }
+    .fc .fc-event:hover { background: #174f59 !important; border-color: #123f47 !important; }
+    .fc .fc-event-main,
+    .fc .fc-event-title,
+    .fc .fc-event-time,
+    .fc .fc-daygrid-event .fc-event-main,
+    .fc .fc-daygrid-event .fc-event-title {
+      color: #ffffff !important;
+      font-weight: 700;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .fc .fc-daygrid-event { margin-top: 3px; }
+    .fc .fc-daygrid-event-dot { border-color: #216b75 !important; }
     .placeholder-card { background: #fff; border: 1px dashed #d8e4e7; border-radius: var(--radius); padding: 58px 20px; text-align: center; color: #8b9ba2; }
     .placeholder-card i { font-size: 38px; color: #a9c9c8; display: block; margin-bottom: 13px; }
     .placeholder-card h3 { color: #50656e; font-size: 16px; font-weight: 800; }
     .modal-content { border: 0; border-radius: 18px; box-shadow: 0 24px 70px rgba(30,60,70,.18); }
     .modal-header { border-bottom: 1px solid #edf1f2; padding: 19px 22px; }
-    .modal-title { font-family: "Plus Jakarta Sans", sans-serif; font-size: 16px; font-weight: 800; }
+    .modal-title { font-family: Inter, "Segoe UI", system-ui, sans-serif; font-size: 16px; font-weight: 800; }
     .modal-body { padding: 22px; max-height: 68vh; overflow: auto; }
     .modal-footer { border-top: 1px solid #edf1f2; padding: 15px 22px; }
     .form-hint { color: #9aa7ad; font-size: 10px; margin-top: 5px; }
@@ -292,7 +313,7 @@
         <div class="d-flex align-items-center gap-2 mb-4">
           <div class="brand-icon" style="width:38px;height:38px;border-radius:12px;"><i class="bi bi-house-heart"></i></div>
           <div>
-            <div class="fw-bold" style="font-family:'Plus Jakarta Sans';font-size:13px;">RT009/019</div>
+            <div class="fw-bold" style="font-family:'Inter';font-size:13px;">RT009/019</div>
             <div class="small text-secondary">Desa Lubang Buaya</div>
           </div>
         </div>
@@ -395,10 +416,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales-all.global.min.js"></script>
 
   <script>
     'use strict';
@@ -413,6 +430,7 @@
       calendarYear: null,
       calendarEvents: [],
       cashRecords: [],
+      cashSummary: null,
       cashSheet: 'kas_rt',
       residentRecords: [],
       paymentRecords: [],
@@ -440,6 +458,63 @@
       kas_pkk: 'Kas PKK',
       kas_rukmat: 'Kas RUKMAT'
     };
+
+    // Cache singkat untuk perpindahan menu; setiap operasi tulis mengosongkannya.
+    const apiReadCache = new Map();
+    const API_READ_ACTIONS = new Set(['get_dashboard', 'list_cash', 'list_residents', 'list_payments', 'list_calendar']);
+    const libraryPromises = new Map();
+
+    function loadScriptOnce(src) {
+      if (libraryPromises.has(src)) return libraryPromises.get(src);
+      const promise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Library gagal dimuat: ' + src));
+        document.head.appendChild(script);
+      }).catch(error => {
+        libraryPromises.delete(src);
+        throw error;
+      });
+      libraryPromises.set(src, promise);
+      return promise;
+    }
+
+    function loadStyleOnce(href) {
+      const exists = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+        .some(link => link.href === href);
+      if (exists) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.onload = resolve;
+        link.onerror = () => reject(new Error('Style kalender gagal dimuat.'));
+        document.head.appendChild(link);
+      });
+    }
+
+    async function ensureChartJs() {
+      if (window.Chart) return;
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js');
+      if (!window.Chart) throw new Error('Chart.js tidak tersedia.');
+    }
+
+    async function ensureCalendarAssets() {
+      await Promise.all([
+        loadStyleOnce('https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css'),
+        window.FullCalendar ? Promise.resolve() : loadScriptOnce('https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js')
+      ]);
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/id.global.min.js');
+      if (!window.FullCalendar) throw new Error('FullCalendar tidak tersedia.');
+    }
+
+    async function ensureXlsxJs() {
+      if (window.XLSX) return;
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+      if (!window.XLSX) throw new Error('Library Excel tidak tersedia.');
+    }
 
     function api(action, payload = {}) {
       return new Promise((resolve, reject) => {
@@ -486,7 +561,22 @@
     }
 
     function apiWithSession(action, payload = {}) {
-      return api(action, Object.assign({}, payload, { token: state.token }));
+      const request = Object.assign({}, payload, { token: state.token });
+      if (API_READ_ACTIONS.has(action)) {
+        const key = action + '|' + JSON.stringify(request);
+        const cached = apiReadCache.get(key);
+        const ttl = action === 'get_dashboard' ? 20000 : 10000;
+        if (cached && Date.now() - cached.time < ttl) return Promise.resolve(cached.data);
+        return api(action, request).then(response => {
+          apiReadCache.set(key, { time: Date.now(), data: response });
+          if (apiReadCache.size > 24) apiReadCache.clear();
+          return response;
+        });
+      }
+      return api(action, request).then(response => {
+        apiReadCache.clear();
+        return response;
+      });
     }
 
     function escapeHtml(value) {
@@ -621,6 +711,15 @@
 
     async function renderPage(page) {
       const host = document.getElementById('pageContent');
+      if (page !== 'dashboard' && state.charts && state.charts.length) {
+        state.charts.forEach(chart => { if (chart && chart.destroy) chart.destroy(); });
+        state.charts = [];
+      }
+      if (page !== 'kalender' && state.calendar) {
+        state.calendar.destroy();
+        state.calendar = null;
+        state.calendarYear = null;
+      }
       host.innerHTML = '<div class="text-center py-5 text-secondary"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</div>';
       try {
         if (page === 'dashboard') return await renderDashboard();
@@ -643,20 +742,14 @@
 
     /* Dashboard */
     async function renderDashboard() {
-      const data = await apiWithSession('get_dashboard');
+      const results = await Promise.all([apiWithSession('get_dashboard'), ensureChartJs()]);
+      const data = results[0];
       const cards = [
         ['kas_rt', 'Kas RT', 'bi-house-check', 'tone-teal'],
         ['kas_pamsimas', 'Kas Pamsimas', 'bi-droplet-half', 'tone-blue'],
         ['kas_pkk', 'Kas PKK', 'bi-people', 'tone-gold'],
         ['kas_rukmat', 'Kas RUKMAT', 'bi-heart-pulse', 'tone-purple']
       ];
-      const chartColors = {
-        kas_rt: { background: 'rgba(63,143,139,.72)', border: '#3f8f8b' },
-        kas_pamsimas: { background: 'rgba(93,145,198,.72)', border: '#5d91c6' },
-        kas_pkk: { background: 'rgba(205,158,82,.72)', border: '#cd9e52' },
-        kas_rukmat: { background: 'rgba(143,122,190,.72)', border: '#8f7abe' }
-      };
-
       document.getElementById('pageContent').innerHTML = `
         <div class="page-heading">
           <div><h2>Ringkasan Dashboard</h2><p>Ikhtisar saldo seluruh kas dan pergerakan masing-masing kas selama 12 bulan terakhir.</p></div>
@@ -674,10 +767,10 @@
           ${cards.map(([key,label]) => `
             <section class="panel">
               <div class="panel-head">
-                <div><h3 class="panel-title">Grafik ${label}</h3><div class="panel-subtitle">Saldo bersih bulanan · pemasukan dikurangi pengeluaran</div></div>
+                <div><h3 class="panel-title">Grafik ${label}</h3><div class="panel-subtitle">Perbandingan pemasukan dan pengeluaran setiap bulan</div></div>
                 <span class="badge-soft badge-neutral">12 bulan terakhir</span>
               </div>
-              <div class="panel-body"><div class="chart-wrap"><canvas id="dashboardChart_${key}" aria-label="Grafik ${label} per bulan" role="img"></canvas></div></div>
+              <div class="panel-body"><div class="chart-wrap"><canvas id="dashboardChart_${key}" aria-label="Grafik pemasukan dan pengeluaran ${label} per bulan" role="img"></canvas></div></div>
             </section>`).join('')}
         </div>`;
 
@@ -690,22 +783,33 @@
       cards.forEach(([key, label]) => {
         const canvas = document.getElementById('dashboardChart_' + key);
         if (!canvas) return;
-        const palette = chartColors[key];
-        const values = (data.chart && data.chart.series && data.chart.series[key]) || [];
+        const values = (data.chart && data.chart.series && data.chart.series[key]) || { income: [], expense: [] };
         const chart = new Chart(canvas, {
           type: 'bar',
           data: {
             labels: data.chart.labels,
-            datasets: [{
-              label: 'Saldo bersih ' + label,
-              data: values,
-              backgroundColor: palette.background,
-              borderColor: palette.border,
-              borderWidth: 1,
-              borderRadius: 6,
-              borderSkipped: false,
-              maxBarThickness: 34
-            }]
+            datasets: [
+              {
+                label: 'Pemasukan',
+                data: values.income || [],
+                backgroundColor: 'rgba(38, 145, 119, .82)',
+                borderColor: '#21866f',
+                borderWidth: 1,
+                borderRadius: 5,
+                borderSkipped: false,
+                maxBarThickness: 24
+              },
+              {
+                label: 'Pengeluaran',
+                data: values.expense || [],
+                backgroundColor: 'rgba(218, 111, 91, .82)',
+                borderColor: '#c85f4c',
+                borderWidth: 1,
+                borderRadius: 5,
+                borderSkipped: false,
+                maxBarThickness: 24
+              }
+            ]
           },
           options: {
             responsive: true,
@@ -722,7 +826,7 @@
                   boxHeight: 7,
                   padding: 18,
                   color: '#71818a',
-                  font: { family: 'DM Sans', size: 11 }
+                  font: { family: 'Inter', size: 11 }
                 }
               },
               tooltip: {
@@ -760,6 +864,7 @@
       const year = state.currentYear;
       const data = await apiWithSession('list_cash', { sheet, month, year });
       state.cashRecords = data.records || [];
+      state.cashSummary = data.summary || null;
       const title = CASH_LABELS[sheet];
       document.getElementById('pageContent').innerHTML = `
         <div class="page-heading">
@@ -878,8 +983,17 @@
 
     function printCashReport() {
       const rows = state.cashRecords.map(r => [r.Transaksi_ID, dateId(r.Tanggal_Transaksi), r.Jenis_Transaksi, money(r.Nominal_Transaksi), r.Keterangan]);
-      printTable(CASH_LABELS[state.cashSheet], 'Periode ' + monthName(state.currentMonth) + ' ' + state.currentYear,
-        ['ID Transaksi','Tanggal','Jenis','Nominal','Keterangan'], rows);
+      const summary = state.cashSummary || { income: 0, expense: 0, balance: 0 };
+      printTable(CASH_LABELS[state.cashSheet], 'Laporan transaksi periode ' + monthName(state.currentMonth) + ' ' + state.currentYear,
+        ['ID Transaksi','Tanggal','Jenis','Nominal','Keterangan'], rows, {
+          summary: [
+            { label: 'Total pemasukan', value: money(summary.income) },
+            { label: 'Total pengeluaran', value: money(summary.expense) },
+            { label: 'Saldo akhir', value: money(summary.balance) },
+            { label: 'Jumlah transaksi', value: String(rows.length) }
+          ],
+          note: 'Saldo akhir merupakan saldo kumulatif sampai akhir periode yang dipilih.'
+        });
     }
 
     function printCashReceipt(row) {
@@ -1002,7 +1116,9 @@
 
     function printResidents(columns) {
       const rows = state.residentRecords.map(r => columns.map(c => r[c[1]] || '-'));
-      printTable('Data Warga RT009/019', 'Daftar data warga dan administrasi', columns.map(c => c[0]), rows);
+      printTable('Data Warga RT009/019', 'Daftar data warga dan administrasi', columns.map(c => c[0]), rows, {
+        summary: [{ label: 'Jumlah data warga', value: String(rows.length) }]
+      });
     }
 
     /* Pamsimas payments */
@@ -1165,8 +1281,18 @@
         r.No_Rumah, r.Nama, r.Status_Pembayaran, r.payment ? r.payment.Tipe : '-',
         r.payment ? money(r.payment.Nominal) : '-', r.payment ? r.payment.Metode_Pembayaran : '-'
       ]);
-      printTable('Laporan Pembayaran Pamsimas', 'Periode ' + state.currentPeriod,
-        ['No Rumah','Nama','Status','Tipe','Nominal','Metode'], rows);
+      const paid = state.paymentRecords.filter(r => r.Status_Pembayaran === 'Lunas');
+      const unpaid = state.paymentRecords.length - paid.length;
+      const collected = paid.reduce((sum, r) => sum + Number(r.payment && r.payment.Nominal || 0), 0);
+      printTable('Laporan Pembayaran Pamsimas', 'Rekap pembayaran periode ' + state.currentPeriod,
+        ['No Rumah','Nama','Status','Tipe','Nominal','Metode'], rows, {
+          summary: [
+            { label: 'Jumlah rumah', value: String(state.paymentRecords.length) },
+            { label: 'Sudah lunas', value: String(paid.length) },
+            { label: 'Belum lunas / belum bayar', value: String(unpaid) },
+            { label: 'Total pembayaran diterima', value: money(collected) }
+          ]
+        });
     }
 
     function printPaymentReceipt(payment) {
@@ -1189,6 +1315,11 @@
 
     /* Calendar */
     async function renderCalendarPage() {
+      await ensureCalendarAssets();
+      if (state.calendar) {
+        state.calendar.destroy();
+        state.calendar = null;
+      }
       const year = String(new Date().getFullYear());
       document.getElementById('pageContent').innerHTML = `
         <div class="page-heading">
@@ -1253,7 +1384,13 @@
         state.calendarEvents = data.records || [];
         state.calendar.removeAllEvents();
         state.calendarEvents.forEach(r => state.calendar.addEvent({
-          title: r.Keterangan, start: r.Kalender_Kerja, allDay: true,
+          title: r.Keterangan,
+          start: r.Kalender_Kerja,
+          allDay: true,
+          backgroundColor: '#216b75',
+          borderColor: '#195862',
+          textColor: '#ffffff',
+          classNames: ['sirt-calendar-event'],
           extendedProps: { rowNumber: r._rowNumber }
         }));
       } catch (error) {
@@ -1295,7 +1432,9 @@
 
     function printCalendar() {
       const rows = state.calendarEvents.map(r => [dateId(r.Kalender_Kerja), r.Keterangan]);
-      printTable('Kalender Kerja RT009/019', 'Agenda tahun ' + state.calendarYear, ['Tanggal','Keterangan'], rows);
+      printTable('Kalender Kerja RT009/019', 'Daftar agenda kegiatan tahun ' + state.calendarYear, ['Tanggal','Keterangan'], rows, {
+        summary: [{ label: 'Jumlah agenda', value: String(rows.length) }]
+      });
     }
 
     /* Shared modal and reports */
@@ -1328,71 +1467,280 @@
       modal.show();
     }
 
-    function exportXlsx(rows, filename, sheetName) {
-      if (!window.XLSX) return showError('Library Excel belum berhasil dimuat.');
-      const data = rows.length ? rows : [{ Informasi: 'Tidak ada data' }];
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, sheetName || 'Data');
-      XLSX.writeFile(wb, filename + '.xlsx');
+    async function exportXlsx(rows, filename, sheetName) {
+      try {
+        await ensureXlsxJs();
+        const data = rows.length ? rows : [{ Informasi: 'Tidak ada data' }];
+        const ws = XLSX.utils.json_to_sheet(data);
+        const keys = Object.keys(data[0] || {});
+        ws['!cols'] = keys.map(key => ({ wch: Math.min(38, Math.max(14, String(key).length + 4)) }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, sheetName || 'Data');
+        XLSX.writeFile(wb, filename + '.xlsx', { compression: true });
+      } catch (error) {
+        showError(error.message || 'File Excel tidak dapat dibuat.');
+      }
     }
 
-    function printTable(title, subtitle, headers, rows) {
-      const body = rows.length
-        ? rows.map(row => '<tr>' + row.map(cell => '<td>' + escapeHtml(cell) + '</td>').join('') + '</tr>').join('')
-        : '<tr><td colspan="' + headers.length + '">Tidak ada data.</td></tr>';
+    function printBaseStyles(orientation) {
+      return `
+        @page { size: A4 ${orientation || 'landscape'}; margin: 13mm 12mm 15mm; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+          color: #23343c;
+          background: #eef2f4;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 10pt;
+          line-height: 1.45;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .report {
+          width: 100%;
+          max-width: 1200px;
+          margin: 24px auto;
+          padding: 28px 32px;
+          background: #fff;
+          box-shadow: 0 8px 28px rgba(24, 50, 60, .10);
+        }
+        .report-brand {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding-bottom: 16px;
+          border-bottom: 3px solid #216b75;
+        }
+        .brand-mark {
+          width: 48px;
+          height: 48px;
+          flex: 0 0 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 12px;
+          color: #fff;
+          background: #216b75;
+          font-size: 16px;
+          font-weight: 800;
+          letter-spacing: .04em;
+        }
+        .brand-copy h2 { margin: 0 0 3px; color: #20343d; font-size: 15pt; font-weight: 800; }
+        .brand-copy p { margin: 0; color: #647780; font-size: 8.5pt; }
+        .report-title { margin: 20px 0 4px; color: #20343d; font-size: 17pt; font-weight: 800; letter-spacing: -.02em; }
+        .report-subtitle { margin: 0; color: #61747d; font-size: 9.5pt; }
+        .report-meta {
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          flex-wrap: wrap;
+          margin: 10px 0 16px;
+          color: #7a8a91;
+          font-size: 8pt;
+        }
+        .summary-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 9px;
+          margin: 0 0 18px;
+        }
+        .summary-item {
+          min-width: 0;
+          padding: 10px 12px;
+          border: 1px solid #dce7e9;
+          border-radius: 8px;
+          background: #f6fafb;
+        }
+        .summary-item span { display: block; margin-bottom: 4px; color: #6c7f87; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .045em; }
+        .summary-item strong { display: block; color: #1e5660; font-size: 11pt; overflow-wrap: anywhere; }
+        .report-note {
+          margin: -4px 0 15px;
+          padding: 9px 11px;
+          border-left: 3px solid #d39b45;
+          background: #fff9ed;
+          color: #6d5b38;
+          font-size: 8pt;
+        }
+        .table-wrap { width: 100%; overflow: visible; }
+        table.report-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 8.5pt; }
+        .report-table thead { display: table-header-group; }
+        .report-table tfoot { display: table-footer-group; }
+        .report-table tr { break-inside: avoid; page-break-inside: avoid; }
+        .report-table th {
+          padding: 9px 8px;
+          border: 1px solid #1c5c65;
+          background: #216b75;
+          color: #fff;
+          text-align: left;
+          font-size: 8pt;
+          font-weight: 800;
+          vertical-align: middle;
+        }
+        .report-table td {
+          padding: 8px;
+          border: 1px solid #dce5e8;
+          color: #344850;
+          vertical-align: top;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+        }
+        .report-table tbody tr:nth-child(even) td { background: #f5f8f9; }
+        .report-table .numeric { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .empty-row td { padding: 22px; color: #84949a; text-align: center; font-style: italic; }
+        .report-footer {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          margin-top: 16px;
+          padding-top: 9px;
+          border-top: 1px solid #dce5e8;
+          color: #84939a;
+          font-size: 7.5pt;
+        }
+        .receipt { max-width: 780px; margin: 0 auto; padding: 30px 34px; border: 1px solid #dce5e8; }
+        .receipt .report-title { text-align: center; margin-top: 24px; font-size: 15pt; letter-spacing: .06em; }
+        .receipt-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 10pt; }
+        .receipt-table td { padding: 11px 9px; border-bottom: 1px solid #e3eaec; vertical-align: top; }
+        .receipt-table td:first-child { width: 38%; color: #71828a; }
+        .receipt-table td:last-child { color: #263b43; font-weight: 700; overflow-wrap: anywhere; }
+        .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; margin-top: 54px; text-align: center; color: #53676f; font-size: 8.5pt; }
+        .signature-line { margin-top: 62px; padding-top: 8px; border-top: 1px solid #829198; }
+        @media screen {
+          .report { border-radius: 10px; }
+        }
+        @media print {
+          body { background: #fff; }
+          .report { max-width: none; margin: 0; padding: 0; box-shadow: none; }
+          .receipt { border: 0; padding: 0; }
+          .report-table { font-size: 8pt; }
+          .report-table th, .report-table td { padding: 6px 7px; }
+          .summary-grid { break-inside: avoid; page-break-inside: avoid; }
+          .report-footer { break-inside: avoid; }
+        }
+        @media (max-width: 760px) {
+          .report { margin: 0; padding: 18px; }
+          .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+      `;
+    }
+
+    function printTable(title, subtitle, headers, rows, options = {}) {
+      const safeRows = Array.isArray(rows) ? rows : [];
+      const safeHeaders = Array.isArray(headers) ? headers : [];
+      const numericHeader = header => /nominal|jumlah|total|tarif|biaya|meter/i.test(String(header || ''));
+      const head = safeHeaders.map(header =>
+        '<th' + (numericHeader(header) ? ' class="numeric"' : '') + '>' + escapeHtml(header) + '</th>'
+      ).join('');
+      const body = safeRows.length
+        ? safeRows.map(row => '<tr>' + safeHeaders.map((header, index) => {
+            const value = row[index] === null || row[index] === undefined || row[index] === '' ? '-' : row[index];
+            return '<td' + (numericHeader(header) ? ' class="numeric"' : '') + '>' + escapeHtml(value) + '</td>';
+          }).join('') + '</tr>').join('')
+        : '<tr class="empty-row"><td colspan="' + Math.max(safeHeaders.length, 1) + '">Tidak ada data untuk ditampilkan pada periode ini.</td></tr>';
+
+      const summary = (options.summary || []).map(item =>
+        '<div class="summary-item"><span>' + escapeHtml(item.label) + '</span><strong>' + escapeHtml(item.value) + '</strong></div>'
+      ).join('');
+      const generatedAt = new Intl.DateTimeFormat('id-ID', {
+        dateStyle: 'long', timeStyle: 'short'
+      }).format(new Date());
+
       const html = `
-        <!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
-        <style>
-          body{font-family:Arial,sans-serif;color:#24343d;padding:28px}
-          .head{border-bottom:2px solid #2f7f83;padding-bottom:14px;margin-bottom:20px}
-          h1{font-size:20px;margin:0 0 5px}p{font-size:12px;color:#66777e;margin:0}
-          .meta{font-size:10px;color:#8a989e;margin-top:8px}
-          table{width:100%;border-collapse:collapse;font-size:10px}
-          th{background:#edf4f4;color:#40575e;text-align:left}
-          th,td{border:1px solid #dfe7e9;padding:8px;vertical-align:top}
-          .foot{margin-top:22px;font-size:9px;color:#88979d;text-align:right}
-          @media print{body{padding:0}@page{size:landscape;margin:12mm}}
-        </style></head><body>
-        <div class="head"><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p><div class="meta">Sistem Informasi RT009/019 · Desa Lubang Buaya · Dicetak ${new Date().toLocaleString('id-ID')}</div></div>
-        <table><thead><tr>${headers.map(h => '<th>' + escapeHtml(h) + '</th>').join('')}</tr></thead><tbody>${body}</tbody></table>
-        <div class="foot">Dokumen laporan Sistem Informasi RT009/019</div>
-        <script>window.onload=function(){window.print();};<\/script></body></html>`;
+        <!doctype html>
+        <html lang="id">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>${escapeHtml(title)}</title>
+          <style>${printBaseStyles(options.orientation || 'landscape')}</style>
+        </head>
+        <body>
+          <main class="report">
+            <header class="report-brand">
+              <div class="brand-mark">RT</div>
+              <div class="brand-copy">
+                <h2>Sistem Informasi Rukun Tangga</h2>
+                <p>RT009/019 · Desa Lubang Buaya · Kecamatan Setu · Kabupaten Bekasi</p>
+              </div>
+            </header>
+            <h1 class="report-title">${escapeHtml(title)}</h1>
+            <p class="report-subtitle">${escapeHtml(subtitle || '')}</p>
+            <div class="report-meta">
+              <span>Dokumen resmi administrasi lingkungan RT009/019</span>
+              <span>Dicetak: ${escapeHtml(generatedAt)}</span>
+            </div>
+            ${summary ? '<section class="summary-grid">' + summary + '</section>' : ''}
+            ${options.note ? '<div class="report-note">' + escapeHtml(options.note) + '</div>' : ''}
+            <div class="table-wrap">
+              <table class="report-table">
+                <thead><tr>${head}</tr></thead>
+                <tbody>${body}</tbody>
+              </table>
+            </div>
+            <footer class="report-footer">
+              <span>Sistem Informasi Rukun Tangga · RT009/019</span>
+              <span>${escapeHtml(options.footer || 'Dokumen dicetak untuk keperluan administrasi dan arsip.')}</span>
+            </footer>
+          </main>
+          <script>window.addEventListener('load',function(){setTimeout(function(){window.focus();window.print();},350);});<\/script>
+        </body>
+        </html>`;
       openPrintWindow(html);
     }
 
     function printDocument(organization, heading, fields, footer) {
+      const generatedAt = new Intl.DateTimeFormat('id-ID', {
+        dateStyle: 'long', timeStyle: 'short'
+      }).format(new Date());
+      const rows = (fields || []).map(([label, value]) =>
+        '<tr><td>' + escapeHtml(label) + '</td><td>' + escapeHtml(value === null || value === undefined || value === '' ? '-' : value) + '</td></tr>'
+      ).join('');
       const html = `
-        <!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(heading)}</title>
-        <style>
-          body{font-family:Arial,sans-serif;color:#263840;padding:35px}
-          .receipt{max-width:720px;margin:0 auto;border:1px solid #dce6e8;padding:30px}
-          .org{text-align:center;border-bottom:2px solid #2f7f83;padding-bottom:18px;margin-bottom:22px}
-          .org h2{font-size:17px;margin:0 0 5px}.org p{font-size:11px;color:#71838a;margin:0}
-          h1{text-align:center;font-size:15px;letter-spacing:.08em;margin:0 0 22px}
-          table{width:100%;border-collapse:collapse;font-size:12px}
-          td{padding:10px 7px;border-bottom:1px solid #e8edef}
-          td:first-child{color:#6d7d84;width:38%}td:last-child{font-weight:700}
-          .sign{display:flex;justify-content:space-between;margin-top:45px;font-size:11px;text-align:center}
-          .sign div{width:42%}.line{border-top:1px solid #77868c;margin-top:55px;padding-top:7px}
-          .foot{font-size:10px;color:#8b999f;text-align:center;margin-top:28px}
-          @media print{body{padding:0}@page{size:A4;margin:18mm}}
-        </style></head><body><div class="receipt">
-          <div class="org"><h2>${escapeHtml(organization)}</h2><p>RT009/019 · Desa Lubang Buaya · Kecamatan Setu · Kabupaten Bekasi</p></div>
-          <h1>${escapeHtml(heading)}</h1>
-          <table>${fields.map(([label,value]) => '<tr><td>' + escapeHtml(label) + '</td><td>' + escapeHtml(value) + '</td></tr>').join('')}</table>
-          <div class="sign"><div>Petugas / Bendahara<div class="line">( ................................ )</div></div><div>Warga / Penerima<div class="line">( ................................ )</div></div></div>
-          <div class="foot">${escapeHtml(footer || '')}<br>Dicetak ${new Date().toLocaleString('id-ID')}</div>
-        </div><script>window.onload=function(){window.print();};<\/script></body></html>`;
+        <!doctype html>
+        <html lang="id">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>${escapeHtml(heading)}</title>
+          <style>${printBaseStyles('portrait')}</style>
+        </head>
+        <body>
+          <main class="report receipt">
+            <header class="report-brand">
+              <div class="brand-mark">RT</div>
+              <div class="brand-copy">
+                <h2>${escapeHtml(organization || 'Sistem Informasi Rukun Tangga')}</h2>
+                <p>RT009/019 · Desa Lubang Buaya · Kecamatan Setu · Kabupaten Bekasi</p>
+              </div>
+            </header>
+            <h1 class="report-title">${escapeHtml(heading)}</h1>
+            <div class="report-meta">
+              <span>Bukti transaksi / pembayaran</span>
+              <span>Dicetak: ${escapeHtml(generatedAt)}</span>
+            </div>
+            <table class="receipt-table"><tbody>${rows}</tbody></table>
+            <div class="signatures">
+              <div>Petugas / Bendahara<div class="signature-line">( ........................................ )</div></div>
+              <div>Warga / Penerima<div class="signature-line">( ........................................ )</div></div>
+            </div>
+            <footer class="report-footer">
+              <span>${escapeHtml(footer || 'Simpan dokumen ini sebagai arsip.')}</span>
+              <span>RT009/019</span>
+            </footer>
+          </main>
+          <script>window.addEventListener('load',function(){setTimeout(function(){window.focus();window.print();},350);});<\/script>
+        </body>
+        </html>`;
       openPrintWindow(html);
     }
 
     function openPrintWindow(html) {
-      const win = window.open('', '_blank', 'width=1000,height=750');
+      const win = window.open('', '_blank', 'width=1100,height=800');
       if (!win) return showError('Popup diblokir browser. Izinkan popup untuk mencetak laporan.');
       win.document.open();
       win.document.write(html);
       win.document.close();
+      try { win.focus(); } catch (_) {}
     }
 
     /* Navigation events */
