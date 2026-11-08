@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Sistem Informasi RT009/009 GreenHarmoni</title>
+  <title>Portal Informasi RT 009 / 019 Lubang Buaya</title>
   
   <!-- CSS Dependencies -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -14,8 +14,8 @@
 
   <style>
     :root {
-      --sidebar-width: 260px;
-      --sidebar-collapsed-width: 70px;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 75px;
       --primary-color: #0d6efd;
       --dark-bg: #0f172a;
       --dark-surface: #1e293b;
@@ -63,12 +63,14 @@
       width: var(--sidebar-collapsed-width);
     }
     #sidebar-wrapper .brand-text, 
+    #sidebar-wrapper .brand-desc,
     #sidebar-wrapper .link-text,
     #sidebar-wrapper .chevron-icon {
       transition: opacity 0.2s ease;
       white-space: nowrap;
     }
     body.sidebar-collapsed #sidebar-wrapper .brand-text,
+    body.sidebar-collapsed #sidebar-wrapper .brand-desc,
     body.sidebar-collapsed #sidebar-wrapper .link-text,
     body.sidebar-collapsed #sidebar-wrapper .chevron-icon {
       display: none !important;
@@ -135,9 +137,10 @@
         margin-left: 0 !important; 
       }
       body.sidebar-collapsed #sidebar-wrapper .brand-text,
+      body.sidebar-collapsed #sidebar-wrapper .brand-desc,
       body.sidebar-collapsed #sidebar-wrapper .link-text,
       body.sidebar-collapsed #sidebar-wrapper .chevron-icon {
-        display: inline-block !important;
+        display: block !important;
       }
     }
 
@@ -160,9 +163,9 @@
   <div id="view-login" class="login-wrapper">
     <div class="card card-login">
       <div class="login-header">
-        <i class="fa-solid fa-building-columns fa-3x mb-2 text-primary"></i>
-        <h4 class="fw-bold mb-0">GreenHarmoni</h4>
-        <small class="text-white-50">Sistem Keuangan & Data RT009/009</small>
+        <i class="fa-solid fa-people-roof fa-3x mb-2 text-primary"></i>
+        <h4 class="fw-bold mb-0">Portal Informasi RT</h4>
+        <small class="text-white-50 d-block fs-7 mt-1">RT 009, RW 019, Lubang Buaya, Setu, Kab Bekasi</small>
       </div>
       <div class="card-body p-4">
         <div id="login-alert" class="alert alert-danger hidden"></div>
@@ -194,10 +197,15 @@
     
     <!-- Component Sidebar -->
     <aside id="sidebar-wrapper">
-      <div class="p-3 text-white border-bottom border-secondary border-opacity-25 d-flex align-items-center justify-content-between" style="height: 65px;">
+      <div class="p-3 text-white border-bottom border-secondary border-opacity-25 d-flex align-items-center justify-content-between" style="min-height: 80px;">
         <div class="d-flex align-items-center gap-3 overflow-hidden">
-          <i class="fa-solid fa-shield-halved text-primary fa-xl"></i>
-          <span class="fw-bold fs-6 brand-text text-truncate">RT009/009 App</span>
+          <i class="fa-solid fa-people-roof text-primary fa-2x ms-1" title="Rukun Tangga 009/019"></i>
+          <div class="overflow-hidden">
+            <div class="fw-bold fs-6 brand-text text-truncate">Portal Informasi RT</div>
+            <small class="text-white-50 brand-desc text-truncate d-block" style="font-size: 0.68rem; line-height: 1.2;">
+              RT 009, RW 019, Lubang Buaya,<br>Setu, Kab Bekasi
+            </small>
+          </div>
         </div>
         <button class="btn btn-sm text-white-50 d-none d-lg-block border-0" onclick="toggleSidebarCollapse()" title="Toggle Sidebar">
           <i class="fa-solid fa-angles-left" id="collapse-icon"></i>
@@ -288,7 +296,7 @@
                 <div class="input-group input-group-sm">
                   <span class="input-group-text bg-light">Tahun:</span>
                   <select id="dash-filter-year" class="form-select fw-bold" onchange="initDashboard()">
-                    <option value="2026" selected>2026</option>
+                    <option value="2026">2026</option>
                     <option value="2025">2025</option>
                     <option value="2027">2027</option>
                   </select>
@@ -350,6 +358,46 @@
         <!-- SECTION 2: DYNAMIC FINANCIAL TABLE (KAS RT, PAMSIMAS, PKK, RUKMAT) -->
         <section id="sec-keuangan" class="content-section hidden">
           
+          <!-- 3 Summary Cards Akumulasi Keseluruhan Periode (All-Time totals) -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="card card-stat p-3 border-start border-success border-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <small class="text-muted fw-bold text-uppercase" id="title-card-pemasukan">TOTAL PEMASUKAN</small>
+                    <h4 class="text-success fw-bold mb-0 mt-1" id="card-total-pemasukan">Rp 0</h4>
+                    <small class="text-muted fs-8">Keseluruhan Periode Data</small>
+                  </div>
+                  <i class="fa-solid fa-arrow-down-left fa-2x text-success opacity-50"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card card-stat p-3 border-start border-danger border-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <small class="text-muted fw-bold text-uppercase" id="title-card-pengeluaran">TOTAL PENGELUARAN</small>
+                    <h4 class="text-danger fw-bold mb-0 mt-1" id="card-total-pengeluaran">Rp 0</h4>
+                    <small class="text-muted fs-8">Keseluruhan Periode Data</small>
+                  </div>
+                  <i class="fa-solid fa-arrow-up-right fa-2x text-danger opacity-50"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card card-stat p-3 border-start border-primary border-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <small class="text-muted fw-bold text-uppercase" id="title-card-saldo">SALDO AKHIR</small>
+                    <h4 class="text-primary fw-bold mb-0 mt-1" id="card-saldo-akhir">Rp 0</h4>
+                    <small class="text-muted fs-8">Akumulasi Saldo Saat Ini</small>
+                  </div>
+                  <i class="fa-solid fa-vault fa-2x text-primary opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="card p-3 p-md-4 shadow-sm border-0">
             <!-- Header & Filter Periode Bulanan/Tahunan -->
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 border-bottom pb-3">
@@ -388,7 +436,7 @@
                 <label class="form-label fs-7 fw-bold mb-1">Filter Tahun:</label>
                 <select id="filter-tx-year" class="form-select form-select-sm" onchange="filterFinancialTable()">
                   <option value="all">Semua Tahun</option>
-                  <option value="2026" selected>2026</option>
+                  <option value="2026">2026</option>
                   <option value="2025">2025</option>
                   <option value="2027">2027</option>
                 </select>
@@ -451,7 +499,7 @@
         <section id="sec-kalender" class="content-section hidden">
           <div class="card p-4 shadow-sm border-0">
             <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calendar-check me-2"></i>Kalender Kerja & Agenda RT</h5>
-            <div class="alert alert-info">Jadwal kegiatan rutin kerja bakti, rapat pengurus, dan posyandu lingkungan RT009/009.</div>
+            <div class="alert alert-info">Jadwal kegiatan rutin kerja bakti, rapat pengurus, dan posyandu lingkungan RT 009 / 019 Lubang Buaya.</div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
@@ -474,7 +522,7 @@
         <!-- SECTION 5: TATA TERTIB -->
         <section id="sec-tatatertib" class="content-section hidden">
           <div class="card p-4 shadow-sm border-0">
-            <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-book-bookmark me-2"></i>Tata Tertib Lingkungan GreenHarmoni</h5>
+            <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-book-bookmark me-2"></i>Tata Tertib Lingkungan RT 009 / 019</h5>
             <ol class="lh-lg text-secondary">
               <li>Tamu yang menginap lebih dari 1x24 jam wajib melapor kepada Ketua RT/Pengurus.</li>
               <li>Iuran bulanan (Keamanan, Kebersihan, Kas RT, PKK, Rukmat) maksimal dibayarkan tanggal 10 setiap bulannya.</li>
@@ -578,12 +626,12 @@
     </div>
   </div>
 
-  <!-- ================= 5. TEMPLATE BUKTI CETAK TRANSAKSI (PRINT / SAVE PDF) ================= -->
+  <!-- ================= 5. TEMPLATE BUKTI CETAK KUITANSI TRANSAKSI (PRINT / SAVE PDF) ================= -->
   <div id="printable-receipt-container" class="hidden">
-    <div style="max-width: 600px; margin: 0 auto; border: 2px solid #0f172a; padding: 25px; border-radius: 8px;">
+    <div style="max-width: 650px; margin: 0 auto; border: 2px solid #0f172a; padding: 25px; border-radius: 8px;">
       <div style="text-align: center; border-bottom: 2px double #0f172a; padding-bottom: 12px; margin-bottom: 20px;">
-        <h3 style="margin: 0; font-weight: bold;">RUKUN TETANGGA 009 / 009</h3>
-        <p style="margin: 4px 0 0 0; font-size: 14px;">PERUMAHAN GREENHARMONI</p>
+        <h3 style="margin: 0; font-weight: bold;">RUKUN TETANGGA 009 / RW 019</h3>
+        <p style="margin: 4px 0 0 0; font-size: 14px;">LUBANG BUAYA, SETU, KAB BEKASI</p>
         <small style="color: #64748b;">KUITANSI BUKTI TRANSAKSI RESMI (TERVERIFIKASI)</small>
       </div>
       
@@ -632,7 +680,7 @@
       </div>
       
       <div style="margin-top: 25px; text-align: center; font-size: 11px; color: #64748b; border-top: 1px dashed #cbd5e1; pt-2;">
-        <i>Dokumen ini dicetak secara sah dari Sistem Keuangan RT009/009 GreenHarmoni.</i>
+        <i>Dokumen ini dicetak secara sah dari Portal Informasi RT 009 / 019 Lubang Buaya.</i>
       </div>
     </div>
   </div>
@@ -665,9 +713,20 @@
     let modalTxBs = null;
     let modalWargaBs = null;
 
+    // Ambil Tahun dan Bulan Saat Ini (Default Dynamic Filter)
+    const now = new Date();
+    const currentYearStr = now.getFullYear().toString();
+    const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0'); // '01' - '12'
+
     document.addEventListener("DOMContentLoaded", () => {
       modalTxBs = new bootstrap.Modal(document.getElementById('modalTx'));
       modalWargaBs = new bootstrap.Modal(document.getElementById('modalWarga'));
+      
+      // Set Default Filter Tahun & Bulan Saat Ini
+      document.getElementById("dash-filter-year").value = currentYearStr;
+      document.getElementById("filter-tx-month").value = currentMonthStr;
+      document.getElementById("filter-tx-year").value = currentYearStr;
+
       checkAuth();
     });
 
@@ -786,6 +845,10 @@
         document.getElementById("table-keuangan-title").innerText = "Riwayat Transaksi " + title;
         document.getElementById("current-sheet-target").value = tabName;
         
+        // Reset Filter Bulan & Tahun ke Bulan Ini saat Ganti Tab Keuangan
+        document.getElementById("filter-tx-month").value = currentMonthStr;
+        document.getElementById("filter-tx-year").value = currentYearStr;
+
         if (currentUser.mode.toLowerCase() === 'admin') {
           document.getElementById("btn-open-add-modal").classList.remove("hidden");
         } else {
@@ -806,7 +869,7 @@
       }
     }
 
-    // CALCULATE DASHBOARD TOTALS
+    // CALCULATE KAS TOTALS
     function calcTotals(rows) {
       let masuk = 0, keluar = 0;
       rows.forEach(r => {
@@ -920,11 +983,25 @@
       });
     }
 
-    // LOAD & FILTER FINANCIAL DATATABLE
+    // LOAD FINANCIAL DATA & CALCULATE ALL-TIME TOTALS (3 CARDS)
     async function loadFinancialTable(sheetName) {
       try {
         const res = await fetch(`${API_URL}?action=get_sheet&sheet=${sheetName}`);
         rawFinancialData = await res.json();
+        
+        // 1. Hitung Akumulasi Total Keseluruhan Periode Data (All-Time)
+        const totalsAll = calcTotals(rawFinancialData);
+        const titleCategory = sheetName.replace('_', ' ').toUpperCase();
+
+        document.getElementById("title-card-pemasukan").innerText = `PEMASUKAN (${titleCategory})`;
+        document.getElementById("title-card-pengeluaran").innerText = `PENGELUARAN (${titleCategory})`;
+        document.getElementById("title-card-saldo").innerText = `SALDO AKHIR (${titleCategory})`;
+
+        document.getElementById("card-total-pemasukan").innerText = `Rp ${totalsAll.masuk.toLocaleString('id-ID')}`;
+        document.getElementById("card-total-pengeluaran").innerText = `Rp ${totalsAll.keluar.toLocaleString('id-ID')}`;
+        document.getElementById("card-saldo-akhir").innerText = `Rp ${totalsAll.saldo.toLocaleString('id-ID')}`;
+
+        // 2. Tampilkan Data Sesuai Filter Bulan/Tahun yang Aktif
         filterFinancialTable();
       } catch (err) {
         Swal.fire('Error', 'Gagal memuat data transaksi.', 'error');
@@ -966,14 +1043,14 @@
         const isMasuk = String(jenis).toLowerCase() === 'masuk';
 
         let actionBtns = `
-          <button class="btn btn-outline-secondary btn-sm me-1" onclick="printReceipt('${id}', '${sheetName}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "\'")}')" title="Cetak Kuitansi">
+          <button class="btn btn-outline-secondary btn-sm me-1" onclick="printReceipt('${id}', '${sheetName}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "'")}')" title="Cetak Kuitansi">
             <i class="fa-solid fa-print"></i>
           </button>
         `;
 
         if (currentUser.mode.toLowerCase() === 'admin') {
           actionBtns += `
-            <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditTxModal('${id}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "\'")}')" title="Edit Data">
+            <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditTxModal('${id}', '${jenis}', '${tgl}', ${nom}, '${ket.replace(/'/g, "'")}')" title="Edit Data">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
             <button class="btn btn-outline-danger btn-sm" onclick="deleteTxConfirm('${id}')" title="Hapus Data">
@@ -994,7 +1071,7 @@
         `;
       });
 
-      // Professional DataTables Export Configurations
+      // DataTables Professional Print & Excel Configurations
       dataTablesInstances['keuangan'] = $('#table-keuangan').DataTable({
         dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"Bf>rtip',
         buttons: [
@@ -1002,7 +1079,7 @@
             extend: 'excelHtml5',
             text: '<i class="fa-solid fa-file-excel me-1"></i> Export Excel',
             className: 'btn btn-success btn-sm font-weight-bold',
-            title: `Laporan Keuangan ${sheetName.toUpperCase()} - RT009/009`,
+            title: `Laporan Keuangan ${sheetName.toUpperCase()} - RT 009/019 Lubang Buaya`,
             exportOptions: { columns: [0, 1, 2, 3, 4] }
           },
           {
@@ -1010,16 +1087,43 @@
             text: '<i class="fa-solid fa-print me-1"></i> Cetak Laporan',
             className: 'btn btn-dark btn-sm font-weight-bold',
             title: '',
-            exportOptions: { columns: [0, 1, 2, 3, 4] },
+            // FIX PRINT: Menggunakan format HTML Kustom agar Data Muncul Sempurna di Dialog Print
             customize: function (win) {
-              $(win.document.body).prepend(`
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-                  <h2 style="margin: 0; font-weight: bold;">LAPORAN KEUANGAN RT009/009 GREENHARMONI</h2>
-                  <h4 style="margin: 5px 0;">KATEGORI: ${sheetName.replace('_', ' ').toUpperCase()}</h4>
-                  <p style="margin: 0; font-size: 12px; color: #555;">Dicetak Pada: ${new Date().toLocaleString('id-ID')} Oleh Admin</p>
+              const categoryTitle = sheetName.replace('_', ' ').toUpperCase();
+              const printMonth = $("#filter-tx-month option:selected").text();
+              const printYear = $("#filter-tx-year option:selected").text();
+              
+              // Ambil isi tabel HTML saat ini
+              const tableHtml = $('#table-keuangan').html();
+
+              $(win.document.body).html(`
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #000;">
+                  <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px;">
+                    <h2 style="margin: 0; font-weight: bold; font-size: 20px;">PORTAL INFORMASI RUKUN TETANGGA 009 / RW 019</h2>
+                    <h4 style="margin: 5px 0 0 0; font-weight: normal; font-size: 15px;">LUBANG BUAYA, SETU, KABUPATEN BEKASI</h4>
+                    <h3 style="margin: 15px 0 5px 0; font-weight: bold; font-size: 16px; text-decoration: underline;">LAPORAN TRANSAKSI KEUANGAN ${categoryTitle}</h3>
+                    <p style="margin: 0; font-size: 12px; color: #333;">PERIODE FILTER: ${printMonth.toUpperCase()} ${printYear.toUpperCase()}</p>
+                  </div>
+                  
+                  <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
+                    ${tableHtml}
+                  </table>
+
+                  <div style="margin-top: 30px; display: flex; justify-content: space-between; text-align: center; font-size: 12px;">
+                    <div style="width: 40%;">
+                      <p style="margin-bottom: 60px;">Mengetahui,<br>Ketua RT 009 / RW 019</p>
+                      <p style="margin: 0; border-bottom: 1px solid #000; display: inline-block; width: 80%; font-weight: bold;">( KETUA RT 009 )</p>
+                    </div>
+                    <div style="width: 40%;">
+                      <p style="margin-bottom: 60px;">Lubang Buaya, ${new Date().toLocaleDateString('id-ID')}<br>Bendahara / Pengurus RT</p>
+                      <p style="margin: 0; border-bottom: 1px solid #000; display: inline-block; width: 80%; font-weight: bold;">( ${currentUser.nama.toUpperCase()} )</p>
+                    </div>
+                  </div>
                 </div>
               `);
-              $(win.document.body).find('table').addClass('table-bordered').css('font-size', '12px');
+
+              // Sembunyikan kolom aksi pada tabel cetak
+              $(win.document.body).find('th:last-child, td:last-child').remove();
             }
           }
         ],
@@ -1158,7 +1262,7 @@
           let actionBtns = `-`;
           if (currentUser.mode.toLowerCase() === 'admin') {
             actionBtns = `
-              <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditWargaModal('${row.No_Rumah}', '${row.Nama.replace(/'/g, "\'")}', '${row.Status}', '${row.App_Username}', '${row.App_Mode}')" title="Edit Warga">
+              <button class="btn btn-outline-primary btn-sm me-1" onclick="openEditWargaModal('${row.No_Rumah}', '${row.Nama.replace(/'/g, "'")}', '${row.Status}', '${row.App_Username}', '${row.App_Mode}')" title="Edit Warga">
                 <i class="fa-solid fa-user-pen"></i>
               </button>
               <button class="btn btn-outline-danger btn-sm" onclick="deleteWargaConfirm('${row.No_Rumah}')" title="Hapus Warga">
@@ -1189,7 +1293,7 @@
               extend: 'excelHtml5',
               text: '<i class="fa-solid fa-file-excel me-1"></i> Export Excel Data Warga',
               className: 'btn btn-success btn-sm font-weight-bold',
-              title: 'Data Warga RT009/009 GreenHarmoni',
+              title: 'Data Warga RT 009/019 Lubang Buaya',
               exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
             }
           ],
